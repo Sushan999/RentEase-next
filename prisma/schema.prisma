@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole
+  phone     String?
+  avatar    String?
+  blocked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  properties Property[]
+  bookings   Booking[]
+  reviews    Review[]
+
+  @@map("users")
+}
+
+model Property {
+  id            Int            @id @default(autoincrement())
+  title         String
+  description   String         @db.Text
+  location      String
+  rent          Float
+  bedrooms      Int
+  bathrooms     Int
+  area          Float?
+  propertyType  PropertyType
+  amenities     String?        @db.Text
+  available     Boolean        @default(true)
+  availableDate DateTime
+  approved      PropertyStatus @default(PENDING)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  landlordId    Int
+
+  // Relations
+  landlord User            @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  images   PropertyImage[]
+  bookings Booking[]
+  reviews  Review[]
+
+  @@map("properties")
+}
+
+model PropertyImage {
+  id         Int      @id @default(autoincrement())
+  url        String
+  alt        String?
+  propertyId Int
+  createdAt  DateTime @default(now())
+
+  // Relations
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("property_images")
+}
+
+model Booking {
+  id         Int           @id @default(autoincrement())
+  startDate  DateTime
+  endDate    DateTime
+  status     BookingStatus @default(PENDING)
+  message    String?       @db.Text
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  tenantId   Int
+  propertyId Int
+
+  // Relations
+  tenant   User     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  rating     Int      @db.TinyInt
+  comment    String?  @db.Text
+  approved   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  tenantId   Int
+  propertyId Int
+
+  // Relations
+  tenant   User     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, propertyId])
+  @@map("reviews")
+}
+
+// Enums
+enum UserRole {
+  LANDLORD
+  TENANT
+  ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  STUDIO
+  ROOM
+  VILLA
+}
+
+enum PropertyStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
