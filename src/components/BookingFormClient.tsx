@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-interface BookingFormClientProps {
-  propertyId: string;
-}
+import { BookingFormClientProps } from "@/types/component-props";
 
 export default function BookingFormClient({
   propertyId,

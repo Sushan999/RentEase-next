@@ -13,39 +13,8 @@ import {
   DollarSign,
 } from "lucide-react";
 import Link from "next/link";
-
-interface Property {
-  id: number;
-  title: string;
-  approved: "PENDING" | "APPROVED" | "REJECTED";
-  location: string;
-  rent: number;
-  bedrooms: number;
-  bathrooms: number;
-  images: { url: string }[];
-  _count: { bookings: number };
-}
-
-interface Booking {
-  id: number;
-  startDate: string;
-  endDate: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "COMPLETED";
-  message?: string;
-  createdAt: string;
-  tenant: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  property: {
-    id: number;
-    title: string;
-    location: string;
-    rent: number;
-    images: { url: string }[];
-  };
-}
+import { Property } from "@/types/property";
+import { Booking } from "@/types/booking";
 
 export default function LandlordDashboard() {
   const { data: session, status } = useSession();
@@ -668,7 +637,7 @@ export default function LandlordDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {property._count.bookings} total
+                          {property._count?.bookings ?? 0} total
                         </div>
                         <div className="text-sm text-gray-500">
                           {

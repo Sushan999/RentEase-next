@@ -2,29 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
-interface Property {
-  id: number;
-  title: string;
-  approved: "PENDING" | "APPROVED" | "REJECTED";
-  landlord: { id: number; name: string; email: string };
-  images: { url: string }[];
-  rent: number;
-  location: string;
-  bedrooms: number;
-  bathrooms: number;
-  propertyType: string;
-  createdAt: string;
-}
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  blocked: boolean;
-  createdAt: string;
-}
+import { Property } from "@/types/property";
+import { User } from "@/types/user";
 
 export default function AdminDashboard() {
   const [redirecting, setRedirecting] = useState(false);
@@ -378,10 +357,10 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {property.landlord.name}
+                          {property.landlord?.name}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {property.landlord.email}
+                          {property.landlord?.email}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -399,7 +378,10 @@ export default function AdminDashboard() {
                         <div className="flex gap-2">
                           <button
                             onClick={() =>
-                              handleUpdateStatus(property.id, "APPROVED")
+                              handleUpdateStatus(
+                                Number(property.id),
+                                "APPROVED"
+                              )
                             }
                             disabled={updating === property.id}
                             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -408,7 +390,10 @@ export default function AdminDashboard() {
                           </button>
                           <button
                             onClick={() =>
-                              handleUpdateStatus(property.id, "REJECTED")
+                              handleUpdateStatus(
+                                Number(property.id),
+                                "REJECTED"
+                              )
                             }
                             disabled={updating === property.id}
                             className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -623,7 +608,10 @@ export default function AdminDashboard() {
                             <>
                               <button
                                 onClick={() =>
-                                  handleUpdateStatus(property.id, "APPROVED")
+                                  handleUpdateStatus(
+                                    Number(property.id),
+                                    "APPROVED"
+                                  )
                                 }
                                 disabled={updating === property.id}
                                 className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
@@ -632,7 +620,10 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 onClick={() =>
-                                  handleUpdateStatus(property.id, "REJECTED")
+                                  handleUpdateStatus(
+                                    Number(property.id),
+                                    "REJECTED"
+                                  )
                                 }
                                 disabled={updating === property.id}
                                 className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"

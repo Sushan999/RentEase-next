@@ -1,43 +1,12 @@
 "use client";
+import { BookingStats } from "@/types/stats";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { MapPin, Bed, Bath, Calendar, Star, Eye, Clock } from "lucide-react";
-
-interface Booking {
-  id: number;
-  startDate: string;
-  endDate: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
-  message?: string | null;
-  createdAt: string;
-  property: {
-    id: number;
-    title: string;
-    location: string;
-    rent: number;
-    bedrooms: number;
-    bathrooms: number;
-    propertyType: string;
-    images: { url: string }[];
-    landlord: {
-      id: number;
-      name: string;
-      email: string;
-      phone?: string | null;
-    };
-  };
-}
-
-interface BookingStats {
-  total: number;
-  pending: number;
-  approved: number;
-  rejected: number;
-  cancelled: number;
-}
+import { Booking } from "@/types/booking";
 
 export default function TenantDashboard() {
   const { data: session, status } = useSession();

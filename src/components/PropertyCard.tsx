@@ -1,12 +1,11 @@
+import { PropertyCardProps } from "@/types/component-props";
 // src/components/PropertyCard.tsx
 import { Property } from "@/types/property";
 import Link from "next/link";
 import { Star, Bed, Bath, Square, MapPin } from "lucide-react";
 import Image from "next/image";
 
-type PropertyCardProps = {
-  property: Property;
-};
+// Removed PropertyCardProps type as it is no longer needed
 
 export default function PropertyCard({ property }: PropertyCardProps) {
   const mainImage = property.images?.[0]?.url || "/placeholder.png";
@@ -63,7 +62,8 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           {/* Location */}
           <div className="flex items-center text-gray-600 mb-4">
             <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-            <span className="text-sm">{property.city}</span>
+            <span className="text-sm">{property.location}</span>
+            <span className="text-sm">{property.location}</span>
           </div>
 
           {/* Property Details */}
@@ -92,7 +92,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             <div className="flex items-center space-x-1">
               {renderStars(property.rating || 0)}
               <span className="text-gray-500 text-xs ml-1">
-                ({property.reviews})
+                ({property.reviews ? property.reviews.length : 0} reviews)
               </span>
             </div>
 

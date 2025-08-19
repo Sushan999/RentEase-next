@@ -26,15 +26,30 @@ export interface PropertyImage {
 }
 
 export interface Property {
+  description?: string;
+  amenities?: string | null;
+  availableDate?: string | Date;
+  averageRating?: number;
+  totalReviews?: number;
+  landlord?: { id: number; name: string; email: string; phone?: string | null };
   id: string | number;
   title: string;
-  city: string;
+  location: string;
   rent: number;
   images: PropertyImage[];
   rating?: number;
-  reviews?: number;
+  reviews?: Array<{
+    id: number;
+    rating: number;
+    comment?: string | null;
+    createdAt: string | Date;
+    tenant: { name: string };
+  }>;
   bedrooms: number;
   bathrooms: number;
   area?: number | null;
   propertyType: string;
+  approved: "PENDING" | "APPROVED" | "REJECTED";
+  _count?: { bookings: number };
+  createdAt?: string;
 }

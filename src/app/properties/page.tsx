@@ -1,20 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-interface Property {
-  id: number;
-  title: string;
-  city: string;
-  rent: number;
-  bedrooms: number;
-  bathrooms: number;
-  images: { id: number; url: string; alt: string }[];
-  rating: number;
-  reviews: number;
-  createdAt: string;
-  propertyType: string;
-}
+import { Property } from "@/types/property";
 import PropertyCard from "@/components/PropertyCard";
 import { Filter, Search, ChevronDown } from "lucide-react";
 import { Listbox } from "@headlessui/react";
@@ -53,6 +40,7 @@ export default function PropertiesPage() {
           reviews?: { rating: number }[];
           createdAt: string;
           propertyType: string;
+          approved?: "PENDING" | "APPROVED" | "REJECTED";
         }) => {
           const totalReviews = p.reviews?.length || 0;
           const rating =
@@ -64,7 +52,7 @@ export default function PropertiesPage() {
               : 0;
           return {
             ...p,
-            city: p.location,
+            location: p.location,
             images: (p.images || []).map(
               (img: { id: number; url: string; alt?: string }) => ({
                 id: img.id,
@@ -74,7 +62,9 @@ export default function PropertiesPage() {
             ),
             rating: Math.round(rating),
             reviews: totalReviews,
-          } as Property;
+            approved: p.approved ?? "APPROVED",
+            createdAt: p.createdAt,
+          };
         }
       );
       setProperties(mapped);
@@ -87,24 +77,28 @@ export default function PropertiesPage() {
     let filteredList = properties.filter(
       (p) =>
         p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.city?.toLowerCase().includes(search.toLowerCase())
+        p.location?.toLowerCase().includes(search.toLowerCase())
     );
     if (sort === "newest") {
       filteredList = filteredList.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt ?? "").getTime() -
+          new Date(a.createdAt ?? "").getTime()
       );
     } else if (sort === "oldest") {
       filteredList = filteredList.sort(
         (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          new Date(a.createdAt ?? "").getTime() -
+          new Date(b.createdAt ?? "").getTime()
       );
     } else if (sort === "priceLow") {
       filteredList = filteredList.sort((a, b) => a.rent - b.rent);
     } else if (sort === "priceHigh") {
       filteredList = filteredList.sort((a, b) => b.rent - a.rent);
     } else if (sort === "rating") {
-      filteredList = filteredList.sort((a, b) => b.rating - a.rating);
+      filteredList = filteredList.sort(
+        (a, b) => (b.rating ?? 0) - (a.rating ?? 0)
+      );
     }
     setFiltered([...filteredList]);
   }, [search, sort, properties]);

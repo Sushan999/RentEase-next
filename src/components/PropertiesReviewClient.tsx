@@ -4,17 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 
 import { Star, User } from "lucide-react";
 
-interface Review {
-  id: number;
-  rating: number;
-  comment?: string;
-  createdAt: string;
-  tenant: { name: string };
-}
-
 interface Props {
   propertyId: number;
-  canReview: boolean; // If tenant is eligible to review
+  canReview: boolean;
 }
 
 export default function PropertyReviewsClient({
