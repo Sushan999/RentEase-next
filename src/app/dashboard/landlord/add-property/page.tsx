@@ -78,8 +78,12 @@ export default function AddPropertyForm() {
       alert("Scuceess");
       // router.push(`/properties/${data.id}`); // Redirect to property detail
       router.push(`/dashboard/landlord`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }

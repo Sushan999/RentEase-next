@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { Star, User } from "lucide-react";
 
@@ -26,7 +26,7 @@ export default function PropertyReviewsClient({
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const res = await fetch(`/api/reviews?propertyId=${propertyId}`);
       const data = await res.json();
@@ -34,11 +34,11 @@ export default function PropertyReviewsClient({
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [propertyId]);
 
   useEffect(() => {
     fetchReviews();
-  }, []);
+  }, [fetchReviews]);
 
   const submitReview = async () => {
     if (rating < 1) {
@@ -60,8 +60,12 @@ export default function PropertyReviewsClient({
       setRating(0);
       setComment("");
       fetchReviews(); // Refresh reviews
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("An unknown error occurred.");
+      }
     } finally {
       setLoading(false);
     }

@@ -40,11 +40,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Remove password
-    const { password: _, ...userWithoutPassword } = user;
-
+    // Create response without password
     return NextResponse.json(
-      { message: "User created successfully", user: userWithoutPassword },
+      {
+        message: "User created successfully",
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      },
       { status: 201 }
     );
   } catch (error) {

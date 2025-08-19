@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface Property {
   id: number;
@@ -26,6 +27,7 @@ interface User {
 }
 
 export default function AdminDashboard() {
+  const [redirecting, setRedirecting] = useState(false);
   const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [pendingProperties, setPendingProperties] = useState<Property[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -34,19 +36,29 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<number | null>(null);
   const [updatingUser, setUpdatingUser] = useState<number | null>(null);
-  // Unauthorized fallback
-  if (
-    typeof window !== "undefined" &&
-    window.location.pathname.startsWith("/dashboard/admin") &&
-    (error === "Unauthorized" || error === "Failed to load dashboard data")
-  ) {
-    window.location.href = "/unauthorized";
-    return null;
-  }
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname.startsWith("/dashboard/admin") &&
+      (error === "Unauthorized" || error === "Failed to load dashboard data")
+    ) {
+      setRedirecting(true);
+      window.location.href = "/unauthorized";
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!redirecting) {
+      fetchDashboard();
+    }
+  }, [redirecting]);
 
   useEffect(() => {
     fetchDashboard();
   }, []);
+
+  if (redirecting) return null;
 
   const fetchDashboard = async () => {
     setLoading(true);
@@ -338,10 +350,14 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {property.images.length > 0 ? (
-                            <img
+                            <Image
                               src={property.images[0].url}
                               alt={property.title}
+                              width={48}
+                              height={48}
                               className="h-12 w-12 rounded-lg object-cover mr-4"
+                              style={{ objectFit: "cover" }}
+                              priority={true}
                             />
                           ) : (
                             <div className="h-12 w-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">
@@ -554,10 +570,14 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {property.images && property.images.length > 0 ? (
-                            <img
+                            <Image
                               src={property.images[0].url}
                               alt={property.title}
+                              width={40}
+                              height={40}
                               className="h-10 w-10 rounded-lg object-cover mr-3"
+                              style={{ objectFit: "cover" }}
+                              priority={true}
                             />
                           ) : (
                             <div className="h-10 w-10 rounded-lg bg-gray-200 mr-3 flex items-center justify-center">

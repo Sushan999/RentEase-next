@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -6,8 +7,8 @@ import { prisma } from "@/lib/prisma";
 // GET single property by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
     const { id } = await params;
     const property = await prisma.property.findUnique({
@@ -87,8 +88,8 @@ export async function GET(
 // PUT - Update property (Owner or Admin only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions);
@@ -137,8 +138,7 @@ export async function PUT(
     } = data;
 
     // Update property
-
-    const updateData: any = {
+    const updateData: Prisma.PropertyUpdateInput = {
       title,
       description,
       location,
@@ -201,8 +201,8 @@ export async function PUT(
 // DELETE property (Owner or Admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions);

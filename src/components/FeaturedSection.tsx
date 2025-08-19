@@ -29,15 +29,20 @@ export default async function FeaturedSection() {
     bathrooms: p.bathrooms,
     area: p.area, // This is Float? (optional) in schema
     propertyType: p.propertyType, // This is PropertyType enum
-    images: p.images.map((img: any) => ({
-      id: img.id,
-      url: img.url,
-      alt: img.alt,
-    })),
+    images: p.images.map(
+      (img: { id: number; url: string; alt: string | null }) => ({
+        id: img.id,
+        url: img.url,
+        alt: img.alt ?? "",
+      })
+    ),
     rating:
       p.reviews.length > 0
         ? Math.round(
-            (p.reviews.reduce((acc: number, r: any) => acc + r.rating, 0) /
+            (p.reviews.reduce(
+              (acc: number, r: { rating: number }) => acc + r.rating,
+              0
+            ) /
               p.reviews.length) *
               10
           ) / 10 // Round to 1 decimal place

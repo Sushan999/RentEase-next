@@ -1,6 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+interface Property {
+  id: number;
+  title: string;
+  city: string;
+  rent: number;
+  bedrooms: number;
+  bathrooms: number;
+  images: { id: number; url: string; alt: string }[];
+  rating: number;
+  reviews: number;
+  createdAt: string;
+  propertyType: string;
+}
 import PropertyCard from "@/components/PropertyCard";
 import { Filter, Search, ChevronDown } from "lucide-react";
 import { Listbox } from "@headlessui/react";
@@ -14,10 +28,10 @@ const sortOptions = [
 ];
 
 export default function PropertiesPage() {
-  const [properties, setProperties] = useState<any[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("newest");
-  const [filtered, setFiltered] = useState<any[]>([]);
+  const [filtered, setFiltered] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,20 +41,42 @@ export default function PropertiesPage() {
       const res = await fetch("/api/properties?status=APPROVED");
       const data = await res.json();
       // Add rating and review count if reviews exist
-      const mapped = data.map((p: any) => {
-        const totalReviews = p.reviews?.length || 0;
-        const rating =
-          totalReviews > 0
-            ? p.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) /
-              totalReviews
-            : 0;
-        return {
-          ...p,
-          city: p.location,
-          rating: Math.round(rating),
-          reviews: totalReviews,
-        };
-      });
+      const mapped: Property[] = data.map(
+        (p: {
+          id: number;
+          title: string;
+          location: string;
+          rent: number;
+          bedrooms: number;
+          bathrooms: number;
+          images: { id: number; url: string; alt?: string }[];
+          reviews?: { rating: number }[];
+          createdAt: string;
+          propertyType: string;
+        }) => {
+          const totalReviews = p.reviews?.length || 0;
+          const rating =
+            totalReviews > 0
+              ? p.reviews!.reduce(
+                  (sum: number, r: { rating: number }) => sum + r.rating,
+                  0
+                ) / totalReviews
+              : 0;
+          return {
+            ...p,
+            city: p.location,
+            images: (p.images || []).map(
+              (img: { id: number; url: string; alt?: string }) => ({
+                id: img.id,
+                url: img.url,
+                alt: img.alt ?? "",
+              })
+            ),
+            rating: Math.round(rating),
+            reviews: totalReviews,
+          } as Property;
+        }
+      );
       setProperties(mapped);
       setLoading(false);
     };
