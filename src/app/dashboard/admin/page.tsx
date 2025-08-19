@@ -34,6 +34,15 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<number | null>(null);
   const [updatingUser, setUpdatingUser] = useState<number | null>(null);
+  // Unauthorized fallback
+  if (
+    typeof window !== "undefined" &&
+    window.location.pathname.startsWith("/dashboard/admin") &&
+    (error === "Unauthorized" || error === "Failed to load dashboard data")
+  ) {
+    window.location.href = "/unauthorized";
+    return null;
+  }
 
   useEffect(() => {
     fetchDashboard();
@@ -168,12 +177,12 @@ export default function AdminDashboard() {
         throw new Error("Failed to update user status");
       }
 
-      // Update local state
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === userId ? { ...user, blocked: !blocked } : user
-        )
-      );
+      // Refetch users from backend to ensure UI matches DB
+      const usersRes = await fetch("/api/users");
+      if (usersRes.ok) {
+        const usersData = await usersRes.json();
+        setUsers(usersData);
+      }
 
       alert(`User ${!blocked ? "blocked" : "unblocked"} successfully!`);
     } catch (err) {

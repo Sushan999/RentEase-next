@@ -105,7 +105,22 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     const { propertyId, startDate, endDate, message } = data;
 
-    // Checkkk if property exists and is available
+    // Check if tenant already has a pending booking for this property
+    const existingPending = await prisma.booking.findFirst({
+      where: {
+        propertyId: Number(propertyId),
+        tenantId: Number(session.user.id),
+        status: "PENDING",
+      },
+    });
+    if (existingPending) {
+      return NextResponse.json(
+        { error: "You already have a pending booking for this property." },
+        { status: 409 }
+      );
+    }
+
+    // Check if property exists and is available
     const property = await prisma.property.findUnique({
       where: { id: Number(propertyId) },
       include: {
