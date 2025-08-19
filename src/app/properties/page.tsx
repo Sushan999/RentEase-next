@@ -37,15 +37,23 @@ export default function PropertiesPage() {
           bedrooms: number;
           bathrooms: number;
           images: { id: number; url: string; alt?: string }[];
-          reviews?: { rating: number }[];
+          reviews?: { rating: number }[] | number;
+          totalReviews?: number;
           createdAt: string;
           propertyType: string;
           approved?: "PENDING" | "APPROVED" | "REJECTED";
         }) => {
-          const totalReviews = p.reviews?.length || 0;
+          const totalReviews =
+            typeof p.totalReviews === "number"
+              ? p.totalReviews
+              : typeof p.reviews === "number"
+              ? p.reviews
+              : Array.isArray(p.reviews)
+              ? p.reviews.length
+              : 0;
           const rating =
-            totalReviews > 0
-              ? p.reviews!.reduce(
+            totalReviews > 0 && Array.isArray(p.reviews)
+              ? p.reviews.reduce(
                   (sum: number, r: { rating: number }) => sum + r.rating,
                   0
                 ) / totalReviews
@@ -61,7 +69,7 @@ export default function PropertiesPage() {
               })
             ),
             rating: Math.round(rating),
-            reviews: totalReviews,
+            totalReviews,
             approved: p.approved ?? "APPROVED",
             createdAt: p.createdAt,
           };

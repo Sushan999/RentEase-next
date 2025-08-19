@@ -23,12 +23,12 @@ export default async function FeaturedSection() {
   const properties: Property[] = propertiesFromDB.map((p) => ({
     id: p.id,
     title: p.title,
-    city: p.location, // Using location field from schema
-    rent: p.rent, // This is Float in schema
+    location: p.location,
+    rent: p.rent,
     bedrooms: p.bedrooms,
     bathrooms: p.bathrooms,
-    area: p.area, // This is Float? (optional) in schema
-    propertyType: p.propertyType, // This is PropertyType enum
+    area: p.area,
+    propertyType: p.propertyType,
     images: p.images.map(
       (img: { id: number; url: string; alt: string | null }) => ({
         id: img.id,
@@ -45,9 +45,10 @@ export default async function FeaturedSection() {
             ) /
               p.reviews.length) *
               10
-          ) / 10 // Round to 1 decimal place
+          ) / 10
         : 0,
-    reviews: p.reviews.length,
+    totalReviews: p.reviews.length,
+    approved: p.approved,
     landlord: {
       id: p.landlord.id,
       name: p.landlord.name,

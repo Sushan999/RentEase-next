@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { Star, User } from "lucide-react";
+import { Review } from "@/types/component-props";
 
 interface Props {
   propertyId: number;

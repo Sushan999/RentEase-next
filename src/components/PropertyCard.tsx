@@ -1,6 +1,6 @@
 import { PropertyCardProps } from "@/types/component-props";
 // src/components/PropertyCard.tsx
-import { Property } from "@/types/property";
+
 import Link from "next/link";
 import { Star, Bed, Bath, Square, MapPin } from "lucide-react";
 import Image from "next/image";
@@ -92,7 +92,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             <div className="flex items-center space-x-1">
               {renderStars(property.rating || 0)}
               <span className="text-gray-500 text-xs ml-1">
-                ({property.reviews ? property.reviews.length : 0} reviews)
+                (
+                {property.totalReviews ??
+                  (typeof property.reviews === "number"
+                    ? property.reviews
+                    : Array.isArray(property.reviews)
+                    ? property.reviews.length
+                    : 0)}{" "}
+                reviews)
               </span>
             </div>
 
