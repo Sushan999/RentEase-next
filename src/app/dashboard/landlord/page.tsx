@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import axios from "axios";
 import {
   Calendar,
@@ -10,7 +11,9 @@ import {
   Home,
   Users,
   DollarSign,
+  Cross,
 } from "lucide-react";
+import Link from "next/link";
 
 interface Property {
   id: number;
@@ -46,6 +49,15 @@ interface Booking {
 }
 
 export default function LandlordDashboard() {
+  const { data: session, status } = useSession();
+  if (
+    typeof window !== "undefined" &&
+    status === "authenticated" &&
+    session?.user?.role !== "LANDLORD"
+  ) {
+    window.location.href = "/unauthorized";
+    return null;
+  }
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -176,10 +188,23 @@ export default function LandlordDashboard() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Landlord Dashboard
-          </h1>
-          <p className="text-gray-600">Manage your properties and bookings</p>
+          <div className="flex flex-col md:flex-row gap-2 justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Landlord Dashboard
+              </h1>
+              <p className="text-gray-600">
+                Manage your properties and bookings
+              </p>
+            </div>
+
+            <Link
+              href="/dashboard/landlord/add-property"
+              className=" px-4 py-2 md:px-8 md:py-4 rounded-md  bg-blue-600 text-white"
+            >
+              + Add Proerty
+            </Link>
+          </div>
         </div>
 
         {/* Summary Cards */}
@@ -438,6 +463,8 @@ export default function LandlordDashboard() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {bookings.map((booking) => {
+                    // Defensive: skip bookings with missing tenant or tenant.name
+                    if (!booking.tenant || !booking.tenant.name) return null;
                     const days = Math.ceil(
                       (new Date(booking.endDate).getTime() -
                         new Date(booking.startDate).getTime()) /
@@ -541,12 +568,12 @@ export default function LandlordDashboard() {
                 No properties listed yet
               </div>
               <div className="text-gray-400 text-sm mt-1">
-                <a
-                  href="/properties/add"
+                <Link
+                  href="/dashboard/landlord/add-property"
                   className="text-blue-600 hover:text-blue-800"
                 >
                   Add your first property →
-                </a>
+                </Link>
               </div>
             </div>
           ) : (

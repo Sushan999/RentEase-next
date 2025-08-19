@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { MapPin, Bed, Bath, Calendar, Star, Eye, Clock } from "lucide-react";
 
 interface Booking {
@@ -8,7 +9,6 @@ interface Booking {
   startDate: string;
   endDate: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
-  totalAmount: number;
   message?: string | null;
   createdAt: string;
   property: {
@@ -38,11 +38,29 @@ interface BookingStats {
 }
 
 export default function TenantDashboard() {
+  const { data: session, status } = useSession();
+  if (
+    typeof window !== "undefined" &&
+    status === "authenticated" &&
+    session?.user?.role !== "TENANT"
+  ) {
+    window.location.href = "/unauthorized";
+    return null;
+  }
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [pendingBookings, setPendingBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<number | null>(null);
+  // Unauthorized fallback
+  if (
+    typeof window !== "undefined" &&
+    window.location.pathname.startsWith("/dashboard/tenant") &&
+    (error === "Unauthorized" || error === "Failed to load your bookings")
+  ) {
+    window.location.href = "/unauthorized";
+    return null;
+  }
 
   useEffect(() => {
     fetchBookings();
@@ -292,9 +310,10 @@ export default function TenantDashboard() {
                     <div className="mt-4 md:mt-0 md:text-right">
                       <div className="text-xl font-bold text-blue-600 mb-2">
                         $
-                        {typeof booking.totalAmount === "number"
-                          ? booking.totalAmount.toLocaleString()
-                          : "0"}
+                        {typeof booking.property.rent === "number"
+                          ? booking.property.rent.toLocaleString()
+                          : "0"}{" "}
+                        / month
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -417,16 +436,10 @@ export default function TenantDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           $
-                          {typeof booking.totalAmount === "number"
-                            ? booking.totalAmount.toLocaleString()
-                            : "0"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          $
                           {typeof booking.property.rent === "number"
                             ? booking.property.rent.toLocaleString()
-                            : "0"}
-                          /month
+                            : "0"}{" "}
+                          / month
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

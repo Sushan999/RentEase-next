@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const property = await prisma.property.findUnique({
       where: { id: Number(id) },
       include: {
@@ -90,6 +90,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -97,7 +98,7 @@ export async function PUT(
     }
 
     const property = await prisma.property.findUnique({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
     });
 
     if (!property) {
@@ -136,6 +137,7 @@ export async function PUT(
     } = data;
 
     // Update property
+
     const updateData: any = {
       title,
       description,
@@ -153,7 +155,7 @@ export async function PUT(
       updateData.approved = approved;
     }
     const updatedProperty = await prisma.property.update({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
       data: updateData,
       include: {
         images: true,
@@ -171,14 +173,14 @@ export async function PUT(
     if (images) {
       // Delete existing images
       await prisma.propertyImage.deleteMany({
-        where: { propertyId: Number(params.id) },
+        where: { propertyId: Number(id) },
       });
 
       // Create new images
       if (images.length > 0) {
         await prisma.propertyImage.createMany({
           data: images.map((img: { url: string; alt?: string }) => ({
-            propertyId: Number(params.id),
+            propertyId: Number(id),
             url: img.url,
             alt: img.alt || "",
           })),
@@ -202,6 +204,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -209,7 +212,7 @@ export async function DELETE(
     }
 
     const property = await prisma.property.findUnique({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
     });
 
     if (!property) {
@@ -220,6 +223,7 @@ export async function DELETE(
     }
 
     // Check if user can delete this property
+
     if (property.landlordId !== Number(session.user.id)) {
       return NextResponse.json(
         { error: "Forbidden - Can only delete your own properties" },
@@ -229,7 +233,7 @@ export async function DELETE(
 
     // Delete property (CASCADE will handle related records)
     await prisma.property.delete({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
     });
 
     return NextResponse.json({ message: "Property deleted successfully" });
