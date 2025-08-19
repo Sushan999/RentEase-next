@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import {
@@ -9,9 +10,7 @@ import {
   CheckCircle,
   XCircle,
   Home,
-  Users,
   DollarSign,
-  Cross,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -50,14 +49,7 @@ interface Booking {
 
 export default function LandlordDashboard() {
   const { data: session, status } = useSession();
-  if (
-    typeof window !== "undefined" &&
-    status === "authenticated" &&
-    session?.user?.role !== "LANDLORD"
-  ) {
-    window.location.href = "/unauthorized";
-    return null;
-  }
+  const [redirecting, setRedirecting] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,8 +57,23 @@ export default function LandlordDashboard() {
   const [updatingBooking, setUpdatingBooking] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchDashboard();
-  }, []);
+    if (
+      typeof window !== "undefined" &&
+      status === "authenticated" &&
+      session?.user?.role !== "LANDLORD"
+    ) {
+      setRedirecting(true);
+      window.location.href = "/unauthorized";
+    }
+  }, [status, session]);
+
+  useEffect(() => {
+    if (!redirecting) {
+      fetchDashboard();
+    }
+  }, [redirecting]);
+
+  if (redirecting) return null;
 
   const fetchDashboard = async () => {
     setLoading(true);
@@ -332,10 +339,14 @@ export default function LandlordDashboard() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               {booking.property.images.length > 0 ? (
-                                <img
+                                <Image
                                   src={booking.property.images[0].url}
                                   alt={booking.property.title}
+                                  width={48}
+                                  height={48}
                                   className="h-12 w-12 rounded-lg object-cover mr-4"
+                                  style={{ objectFit: "cover" }}
+                                  priority={true}
                                 />
                               ) : (
                                 <div className="h-12 w-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">
@@ -372,7 +383,7 @@ export default function LandlordDashboard() {
                             </div>
                             {booking.message && (
                               <div className="text-sm text-gray-600 mt-1 italic">
-                                "{booking.message}"
+                                &quot;{booking.message}&quot;
                               </div>
                             )}
                           </td>
@@ -477,10 +488,14 @@ export default function LandlordDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             {booking.property.images.length > 0 ? (
-                              <img
+                              <Image
                                 src={booking.property.images[0].url}
                                 alt={booking.property.title}
+                                width={40}
+                                height={40}
                                 className="h-10 w-10 rounded-lg object-cover mr-3"
+                                style={{ objectFit: "cover" }}
+                                priority={true}
                               />
                             ) : (
                               <div className="h-10 w-10 rounded-lg bg-gray-200 mr-3 flex items-center justify-center">
@@ -604,10 +619,14 @@ export default function LandlordDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {property.images.length > 0 ? (
-                            <img
+                            <Image
                               src={property.images[0].url}
                               alt={property.title}
+                              width={48}
+                              height={48}
                               className="h-12 w-12 rounded-lg object-cover mr-4"
+                              style={{ objectFit: "cover" }}
+                              priority={true}
                             />
                           ) : (
                             <div className="h-12 w-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">

@@ -48,7 +48,7 @@ export default function SignUp() {
       } else {
         alert(data.error || "An error occurred");
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred during registration");
     }
 

@@ -7,8 +7,8 @@ import { BookingStatus } from "@prisma/client";
 // To Update booking status (Landlord or Admin only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
     const session = await getServerSession(authOptions);
 
@@ -16,8 +16,11 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Await the params since they're now a Promise
+    const { id } = await params;
+
     const booking = await prisma.booking.findUnique({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
       include: {
         property: {
           include: {
@@ -59,7 +62,7 @@ export async function PUT(
 
     // Update booking
     const updatedBooking = await prisma.booking.update({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
       data: { status },
       include: {
         tenant: {
@@ -99,8 +102,8 @@ export async function PUT(
 // DELETE booking (Tenant or Admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
     const session = await getServerSession(authOptions);
 
@@ -108,8 +111,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Await the params since they're now a Promise
+    const { id } = await params;
+
     const booking = await prisma.booking.findUnique({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
     });
 
     if (!booking) {
@@ -137,7 +143,7 @@ export async function DELETE(
     }
 
     await prisma.booking.delete({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
     });
 
     return NextResponse.json({ message: "Booking deleted successfully" });

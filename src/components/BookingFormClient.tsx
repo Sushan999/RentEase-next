@@ -32,7 +32,7 @@ export default function BookingFormClient({
         const data = await res.json();
         alert(data.error || "Booking failed. Please try again.");
       }
-    } catch (err) {
+    } catch {
       alert("An error occurred. Please try again.");
     } finally {
       setLoading(false);

@@ -1,4 +1,5 @@
 import Title from "./Title";
+import Image from "next/image";
 
 export default function About() {
   return (
@@ -9,11 +10,15 @@ export default function About() {
           subtitle=" Passionate About Properties, Dedicated to your Vision"
         />
         <div className="flex flex-col md:flex-row items-center md:items-start md:gap-20 mt-8">
-          <img
-            src="brand_img.png"
-            alt=""
+          <Image
+            src="/brand_img.png"
+            alt="Our Brand"
+            width={600}
+            height={400}
             className="w-full sm:w-1/2 max-w-lg"
-          ></img>
+            style={{ objectFit: "cover" }}
+            priority={true}
+          />
           <div className="flex flex-col items-center md:items-start mt-10 text-gray-600">
             <div className="grid grid-cols-2 gap-6 md:gap-10 w-full 2xl:pr-28">
               <div>

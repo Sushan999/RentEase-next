@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { MapPin, Bed, Bath, Calendar, Star, Eye, Clock } from "lucide-react";
 
 interface Booking {
@@ -39,32 +41,46 @@ interface BookingStats {
 
 export default function TenantDashboard() {
   const { data: session, status } = useSession();
-  if (
-    typeof window !== "undefined" &&
-    status === "authenticated" &&
-    session?.user?.role !== "TENANT"
-  ) {
-    window.location.href = "/unauthorized";
-    return null;
-  }
+  const [redirecting, setRedirecting] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [pendingBookings, setPendingBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<number | null>(null);
-  // Unauthorized fallback
-  if (
-    typeof window !== "undefined" &&
-    window.location.pathname.startsWith("/dashboard/tenant") &&
-    (error === "Unauthorized" || error === "Failed to load your bookings")
-  ) {
-    window.location.href = "/unauthorized";
-    return null;
-  }
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      status === "authenticated" &&
+      session?.user?.role !== "TENANT"
+    ) {
+      setRedirecting(true);
+      window.location.href = "/unauthorized";
+    }
+  }, [status, session]);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname.startsWith("/dashboard/tenant") &&
+      (error === "Unauthorized" || error === "Failed to load your bookings")
+    ) {
+      setRedirecting(true);
+      window.location.href = "/unauthorized";
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!redirecting) {
+      fetchBookings();
+    }
+  }, [redirecting]);
 
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  if (redirecting) return null;
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -272,10 +288,14 @@ export default function TenantDashboard() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between">
                     <div className="flex items-start space-x-4">
                       {booking.property.images.length > 0 ? (
-                        <img
+                        <Image
                           src={booking.property.images[0].url}
                           alt={booking.property.title}
+                          width={64}
+                          height={64}
                           className="w-16 h-16 rounded-lg object-cover"
+                          style={{ objectFit: "cover" }}
+                          priority={true}
                         />
                       ) : (
                         <div className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
@@ -359,12 +379,12 @@ export default function TenantDashboard() {
               <div className="text-gray-400 text-sm mt-1">
                 Start browsing properties to make your first booking!
               </div>
-              <a
+              <Link
                 href="/properties"
                 className="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
               >
                 Browse Properties
-              </a>
+              </Link>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -397,10 +417,14 @@ export default function TenantDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {booking.property.images.length > 0 ? (
-                            <img
+                            <Image
                               src={booking.property.images[0].url}
                               alt={booking.property.title}
+                              width={48}
+                              height={48}
                               className="h-12 w-12 rounded-lg object-cover mr-4"
+                              style={{ objectFit: "cover" }}
+                              priority={true}
                             />
                           ) : (
                             <div className="h-12 w-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">
@@ -490,13 +514,13 @@ export default function TenantDashboard() {
             Quick Actions
           </h2>
           <div className="flex flex-wrap gap-4">
-            <a
+            <Link
               href="/properties"
               className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors flex items-center"
             >
               <Star className="h-5 w-5 mr-2" />
               Browse Properties
-            </a>
+            </Link>
             <button
               onClick={fetchBookings}
               className="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition-colors flex items-center"

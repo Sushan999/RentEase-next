@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { PropertyType, PropertyStatus } from "@prisma/client";
+import { PropertyType, PropertyStatus, Prisma } from "@prisma/client";
 
 // GET all properties with search and filters
 export async function GET(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get("sortOrder") === "desc" ? "desc" : "asc";
     const status = searchParams.get("status") as PropertyStatus | null;
 
-    const where: any = {
+    const where: Prisma.PropertyWhereInput = {
       ...(status
         ? { approved: status }
         : { approved: PropertyStatus.APPROVED }),

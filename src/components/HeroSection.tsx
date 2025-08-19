@@ -1,14 +1,19 @@
 // components/HeroSection.tsx
+import Image from "next/image";
 export function HeroSection() {
   return (
     <section className="relative bg-gray-50">
       {/* Background */}
       <div className="absolute inset-0">
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1973&q=80"
           alt="Modern apartment buildings and residential complex"
+          fill
           className="w-full h-full object-cover opacity-40"
+          style={{ objectFit: "cover" }}
+          priority={true}
         />
+        {/* Make sure to import Image from next/image at the top */}
         <div className="absolute inset-0 bg-black/40" />
       </div>
 

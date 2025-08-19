@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
@@ -143,10 +144,13 @@ export default async function PropertyPage({ params }: Props) {
         {/* Image gallery */}
         <div className="relative w-full h-64 md:h-96 mb-6 md:mb-8 rounded-lg overflow-hidden">
           {property.images.length > 0 ? (
-            <img
+            <Image
               src={property.images[0].url}
               alt={property.images[0].alt ?? property.title}
+              fill
               className="w-full h-full object-cover"
+              style={{ objectFit: "cover" }}
+              priority={true}
             />
           ) : (
             <div className="w-full h-full bg-gray-300 flex items-center justify-center">

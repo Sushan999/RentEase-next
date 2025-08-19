@@ -1,7 +1,8 @@
 // src/components/PropertyCard.tsx
 import { Property } from "@/types/property";
 import Link from "next/link";
-import { Star, Bed, Bath, Home, Square, MapPin } from "lucide-react";
+import { Star, Bed, Bath, Square, MapPin } from "lucide-react";
+import Image from "next/image";
 
 type PropertyCardProps = {
   property: Property;
@@ -27,10 +28,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       <div className="group cursor-pointer bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-200 border border-gray-100 shadow-md">
         {/* Image Container */}
         <div className="relative h-48 overflow-hidden">
-          <img
+          <Image
             src={mainImage}
             alt={property.title}
+            width={400}
+            height={192}
             className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+            style={{ objectFit: "cover" }}
+            priority={true}
           />
 
           {/* Property Type Badge */}

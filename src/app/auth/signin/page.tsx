@@ -38,7 +38,7 @@ export default function SignIn() {
           router.push("/dashboard/tenant");
         }
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred during sign in");
     }
 

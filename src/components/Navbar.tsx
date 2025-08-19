@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X, Home, User, LogOut, Settings, Building2 } from "lucide-react";
+import { Menu, X, Home, User, LogOut, Settings } from "lucide-react";
 import { UserRole } from "@prisma/client";
 
 export default function Navbar() {
