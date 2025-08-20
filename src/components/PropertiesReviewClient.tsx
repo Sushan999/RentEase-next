@@ -15,6 +15,7 @@ export default function PropertyReviewsClient({
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const fetchReviews = useCallback(async () => {
     setLoading(true);
@@ -34,8 +35,9 @@ export default function PropertyReviewsClient({
   }, [fetchReviews]);
 
   const submitReview = async () => {
+    setApiError(null);
     if (rating < 1) {
-      alert("Please select a rating");
+      setApiError("Please select a rating");
       return;
     }
     setSubmitting(true);
@@ -46,15 +48,15 @@ export default function PropertyReviewsClient({
         body: JSON.stringify({ propertyId, rating, comment }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to submit review");
-
-      alert("Review submitted successfully");
+      if (!res.ok) {
+        setApiError(data.error || "Failed to submit review");
+        return;
+      }
       setRating(0);
       setComment("");
       fetchReviews();
     } catch (error) {
-      if (error instanceof Error) alert(error.message);
-      else alert("An unknown error occurred.");
+      setApiError("An unknown error occurred.");
     } finally {
       setSubmitting(false);
     }
@@ -67,7 +69,7 @@ export default function PropertyReviewsClient({
         className={`h-5 w-5 cursor-pointer ${
           i < current ? "text-yellow-400 fill-current" : "text-gray-300"
         }`}
-        onClick={() => canSubmit && setRating(i + 1)}
+        onClick={() => setRating(i + 1)}
       />
     ));
 
@@ -76,7 +78,6 @@ export default function PropertyReviewsClient({
   return (
     <div className="bg-white rounded-lg p-4 md:p-6">
       <h2 className="text-xl font-semibold mb-4">Reviews ({reviews.length})</h2>
-
       {reviews.length === 0 && <p className="text-gray-500">No reviews yet</p>}
       <div className="space-y-4 mb-6">
         {reviews.map((review) => (
@@ -95,27 +96,25 @@ export default function PropertyReviewsClient({
           </div>
         ))}
       </div>
-
-      {canSubmit && (
-        <div className="space-y-2">
-          <h3 className="font-semibold">Submit Your Review</h3>
-          <div className="flex">{renderStars(rating)}</div>
-          <textarea
-            className="w-full border border-gray-300 rounded p-2 mt-2"
-            rows={3}
-            placeholder="Write your comment..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-            onClick={submitReview}
-            disabled={submitting}
-          >
-            {submitting ? <LoadingSpinner /> : "Submit Review"}
-          </button>
-        </div>
-      )}
+      <div className="space-y-2">
+        <h3 className="font-semibold">Submit Your Review</h3>
+        <div className="flex">{renderStars(rating)}</div>
+        <textarea
+          className="w-full border border-gray-300 rounded p-2 mt-2"
+          rows={3}
+          placeholder="Write your comment..."
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          onClick={submitReview}
+          disabled={submitting}
+        >
+          {submitting ? <LoadingSpinner /> : "Submit Review"}
+        </button>
+        {apiError && <p className="text-red-500 mt-2">{apiError}</p>}
+      </div>
     </div>
   );
 }

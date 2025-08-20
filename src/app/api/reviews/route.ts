@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       (session.user.role !== "LANDLORD" && session.user.role !== "TENANT")
     ) {
       return NextResponse.json(
-        { error: "Unauthorized - Only landlord or tenant access allowed" },
+        { error: "Unauthorized - Only Tenant can submit a review" },
         { status: 401 }
       );
     }

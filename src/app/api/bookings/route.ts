@@ -101,6 +101,12 @@ export async function POST(request: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    if (session.user.role !== "TENANT") {
+      return NextResponse.json(
+        { error: "Only tenants can create bookings." },
+        { status: 403 }
+      );
+    }
 
     const data = await request.json();
     const { propertyId, startDate, endDate, message } = data;
