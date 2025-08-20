@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-
 import { Star, User } from "lucide-react";
 import { Review } from "@/types/component-props";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface Props {
   propertyId: number;
@@ -17,15 +17,19 @@ export default function PropertyReviewsClient({
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchReviews = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await fetch(`/api/reviews?propertyId=${propertyId}`);
       const data = await res.json();
       setReviews(data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   }, [propertyId]);
 
@@ -38,29 +42,25 @@ export default function PropertyReviewsClient({
       alert("Please select a rating");
       return;
     }
-    setLoading(true);
+    setSubmitting(true);
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ propertyId, rating, comment }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit review");
 
       alert("Review submitted successfully");
       setRating(0);
       setComment("");
-      fetchReviews(); // Refresh reviews
+      fetchReviews();
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("An unknown error occurred.");
-      }
+      if (error instanceof Error) alert(error.message);
+      else alert("An unknown error occurred.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -75,11 +75,12 @@ export default function PropertyReviewsClient({
       />
     ));
 
+  if (loading) return <LoadingSpinner />;
+
   return (
     <div className="bg-white rounded-lg p-4 md:p-6">
       <h2 className="text-xl font-semibold mb-4">Reviews ({reviews.length})</h2>
 
-      {/* Existing reviews */}
       {reviews.length === 0 && <p className="text-gray-500">No reviews yet</p>}
       <div className="space-y-4 mb-6">
         {reviews.map((review) => (
@@ -99,7 +100,6 @@ export default function PropertyReviewsClient({
         ))}
       </div>
 
-      {/* Submit new review */}
       {canReview && (
         <div className="space-y-2">
           <h3 className="font-semibold">Submit Your Review</h3>
@@ -114,9 +114,9 @@ export default function PropertyReviewsClient({
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
             onClick={submitReview}
-            disabled={loading}
+            disabled={submitting}
           >
-            Submit Review
+            {submitting ? <LoadingSpinner /> : "Submit Review"}
           </button>
         </div>
       )}
