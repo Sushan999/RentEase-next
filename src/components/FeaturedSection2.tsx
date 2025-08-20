@@ -1,10 +1,10 @@
-// app/components/FeaturedSection.tsx
-
+export const dynamic = "force-dynamic";
 import Title from "./Title";
-import { prisma } from "@/lib/prisma";
-import PropertyCard from "./PropertyCard";
-import { Property } from "@/types/property";
-import Link from "next/link";
+
+import { prisma } from "@/lib/prisma"; // Keep one instance
+import PropertyCard from "./PropertyCard"; // Keep one instance
+import { Property } from "@/types/property"; // Keep one instance
+import Link from "next/link"; // Keep one instance
 
 export default async function FeaturedSection2() {
   // Fetch properties server-side
