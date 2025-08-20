@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import Image from "next/image";
-import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import {
@@ -13,8 +13,6 @@ import {
   Mail,
   User,
 } from "lucide-react";
-import BookingForm from "@/components/BookingFormClient";
-import PropertyReviewsClient from "@/components/PropertiesReviewClient";
 
 interface PropertyDetail {
   id: number;
@@ -41,48 +39,21 @@ interface PropertyDetail {
   totalReviews: number;
 }
 
-interface Props {
+type PageProps = {
   params: Promise<{ id: string }>;
-}
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export default async function PropertyPage({
+  params,
+  searchParams,
+}: PageProps) {
+  await searchParams; // Await searchParams to satisfy type checking
   const { id: paramId } = await params;
-
-  if (!paramId || isNaN(Number(paramId)) || Number(paramId) <= 0) {
-    return {
-      title: "Property Not Found",
-      description: "The requested property could not be found",
-    };
-  }
-
-  const property = await prisma.property.findUnique({
-    where: { id: Number(paramId) },
-  });
-
-  return {
-    title: property?.title || "Property Detail",
-    description: property?.description || "View property details",
-  };
-}
-
-export default async function PropertyPage({ params }: Props) {
-  const { id: paramId } = await params;
-
-  if (!paramId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Invalid property ID</h1>
-      </div>
-    );
-  }
-
   const id = Number(paramId);
+
   if (isNaN(id) || id <= 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Invalid property ID</h1>
-      </div>
-    );
+    notFound();
   }
 
   const propertyRaw = await prisma.property.findUnique({
@@ -95,11 +66,7 @@ export default async function PropertyPage({ params }: Props) {
   });
 
   if (!propertyRaw) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Property not found</h1>
-      </div>
-    );
+    notFound();
   }
 
   const property: PropertyDetail = {
@@ -121,7 +88,7 @@ export default async function PropertyPage({ params }: Props) {
   const session = await getServerSession(authOptions);
   const isTenant = session?.user.role === "TENANT";
 
-  const formatDate = (date: Date) =>
+  const formatDate = (date: Date | string) =>
     new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -209,10 +176,7 @@ export default async function PropertyPage({ params }: Props) {
             )}
 
             {/* Reviews */}
-            {/* <PropertyReviewsClient
-              propertyId={property.id}
-              canReview={isTenant}
-            /> */}
+            {/* <PropertyReviewsClient propertyId={property.id} canReview={true} /> */}
           </div>
 
           {/* Booking & Landlord Info */}
@@ -226,11 +190,7 @@ export default async function PropertyPage({ params }: Props) {
                 Available from {formatDate(property.availableDate)}
               </div>
 
-              {/* {isTenant && (
-                <div className="sticky top-4">
-                  <BookingForm propertyId={property.id.toString()} />
-                </div>
-              )} */}
+              {/* <BookingForm propertyId={property.id.toString()} /> */}
             </div>
 
             {/* Landlord Info */}
