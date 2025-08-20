@@ -1,63 +1,59 @@
-// app/components/FeaturedSection.tsx
+"use client";
 
+"use client";
+import { useEffect, useState } from "react";
 import Title from "./Title";
-import { prisma } from "@/lib/prisma";
 import PropertyCard from "./PropertyCard";
 import { Property } from "@/types/property";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
-export default async function FeaturedSection2() {
-  // Fetch properties server-side
-  const propertiesFromDB = await prisma.property.findMany({
-    where: { approved: "APPROVED" },
-    include: {
-      images: true,
-      reviews: true,
-      landlord: true,
-    },
-    take: 4,
-    orderBy: { createdAt: "desc" },
-  });
+export default function FeaturedSection2() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Map DB data to Property type your PropertyCard expects
-  let properties: Property[] = propertiesFromDB.map((p) => ({
-    id: p.id,
-    title: p.title,
-    location: p.location,
-    rent: p.rent,
-    bedrooms: p.bedrooms,
-    bathrooms: p.bathrooms,
-    area: p.area,
-    propertyType: p.propertyType,
-    images: p.images.map(
-      (img: { id: number; url: string; alt: string | null }) => ({
-        id: img.id,
-        url: img.url,
-        alt: img.alt ?? "",
-      })
-    ),
-    rating:
-      p.reviews.length > 0
-        ? Math.round(
-            (p.reviews.reduce(
-              (acc: number, r: { rating: number }) => acc + r.rating,
-              0
-            ) /
-              p.reviews.length) *
-              10
-          ) / 10
-        : 0,
-    totalReviews: p.reviews.length,
-    approved: p.approved,
-    landlord: {
-      id: p.landlord.id,
-      name: p.landlord.name,
-      email: p.landlord.email,
-    },
-  }));
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await fetch("/api/properties?limit=4&order=desc");
+        if (!response.ok) throw new Error("Failed to fetch properties");
+        const data = await response.json();
+        setProperties(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProperties();
+  }, []);
 
-  // Sort by rating descending
-  properties = properties.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  if (loading) {
+    return (
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <Title
+            title="Our Top Rated Properties"
+            subtitle="Discover our Properties with Top Ratings"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-gray-200 animate-pulse rounded-lg h-64"
+              ></div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Sort by top reviewed (descending)
+  const sortedProperties = [...properties].sort(
+    (a, b) => (b.totalReviews ?? 0) - (a.totalReviews ?? 0)
+  );
 
   return (
     <section className="py-12">
@@ -67,8 +63,16 @@ export default async function FeaturedSection2() {
           subtitle="Discover our Properties with Top Ratings"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+          {sortedProperties.map((property, idx) => (
+            <motion.div
+              key={property.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, delay: idx * 0.15 }}
+            >
+              <PropertyCard property={property} />
+            </motion.div>
           ))}
         </div>
       </div>

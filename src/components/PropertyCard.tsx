@@ -1,26 +1,26 @@
+"use client";
 import { PropertyCardProps } from "@/types/component-props";
-// src/components/PropertyCard.tsx
 
 import Link from "next/link";
 import { Star, Bed, Bath, Square, MapPin } from "lucide-react";
 import Image from "next/image";
 
-// Removed PropertyCardProps type as it is no longer needed
-
 export default function PropertyCard({ property }: PropertyCardProps) {
   const mainImage = property.images?.[0]?.url || "/placeholder.png";
 
-  // Render stars visually
-  const renderStars = (rating: number) =>
-    Array.from({ length: 5 }, (_, i) => (
+  // Ensure rating is rounded and fill color is applied for filled stars
+  const renderStars = (rating: number) => {
+    const rounded = Math.round(rating || 0);
+    return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
         size={14}
-        className={`${
-          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
-        }`}
+        className={i < rounded ? "text-yellow-400" : "text-gray-300"}
+        fill={i < rounded ? "#facc15" : "none"}
+        stroke={i < rounded ? "#facc15" : "#d1d5db"}
       />
     ));
+  };
 
   return (
     <Link href={`/properties/${property.id}`}>
@@ -89,8 +89,13 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           {/* Bottom Row */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
             {/* Rating */}
+
             <div className="flex items-center space-x-1">
-              {renderStars(property.rating || 0)}
+              {renderStars(
+                typeof property.averageRating === "number"
+                  ? property.averageRating
+                  : property.rating || 0
+              )}
               <span className="text-gray-500 text-xs ml-1">
                 (
                 {property.totalReviews ??
