@@ -1,13 +1,16 @@
-export const dynamic = "force-dynamic";
-import Title from "./Title";
+// app/components/FeaturedSection.tsx
 
-import { prisma } from "@/lib/prisma"; // Keep one instance
-import PropertyCard from "./PropertyCard"; // Keep one instance
-import { Property } from "@/types/property"; // Keep one instance
-import Link from "next/link"; // Keep one instance
+import Title from "./Title";
+import { prisma } from "@/lib/prisma";
+import PropertyCard from "./PropertyCard";
+import { Property } from "@/types/property";
+import Link from "next/link";
+
+// Force this component to always fetch fresh data (no caching)
+export const dynamic = "force-dynamic";
 
 export default async function FeaturedSection2() {
-  // Fetch properties server-side
+  // Fetch properties from DB
   const propertiesFromDB = await prisma.property.findMany({
     where: { approved: "APPROVED" },
     include: {
