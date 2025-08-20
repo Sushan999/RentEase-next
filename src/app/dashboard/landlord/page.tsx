@@ -144,21 +144,21 @@ export default function LandlordDashboard() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center bg-white p-8 rounded-lg shadow-md">
-          <div className="text-red-600 text-xl mb-4">{error}</div>
-          <button
-            onClick={fetchDashboard}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+  //       <div className="text-center bg-white p-8 rounded-lg shadow-md">
+  //         <div className="text-red-600 text-xl mb-4">{error}</div>
+  //         <button
+  //           onClick={fetchDashboard}
+  //           className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+  //         >
+  //           Retry
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -166,7 +166,7 @@ export default function LandlordDashboard() {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row gap-2 justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl md:text-4xl text-gray-900 mb-2">
                 Landlord Dashboard
               </h1>
               <p className="text-gray-600">

@@ -22,23 +22,25 @@ export default function About() {
           <div className="flex flex-col items-center md:items-start mt-10 text-gray-600">
             <div className="grid grid-cols-2 gap-6 md:gap-10 w-full 2xl:pr-28">
               <div>
-                <p className="text-4xl font-medium text-gray-800">10+</p>
-                <p>Years of Excellence</p>
+                <p className="text-3xl md:text-4xl font-medium text-gray-800">
+                  10+
+                </p>
+                <p className="text-sm">Years of Excellence</p>
               </div>
               <div>
-                <p className="text-4xl font-medium text-gray-800">12+</p>
-                <p>Projects Completed</p>
+                <p className="text-3xl font-medium text-gray-800">12+</p>
+                <p className="text-sm">Projects Completed</p>
               </div>
               <div>
-                <p className="text-4xl font-medium text-gray-800">20+</p>
-                <p>Mn. Sq. Ft. Delivered</p>
+                <p className="text-3xl font-medium text-gray-800">20+</p>
+                <p className="text-sm">Mn. Sq. Ft. Delivered</p>
               </div>
-              <div>
-                <p className="text-4xl font-medium text-gray-800">25+</p>
+              <div className="text-sm">
+                <p className="text-3xl font-medium text-gray-800">25+</p>
                 <p>Ongoing Projects</p>
               </div>
             </div>
-            <p className="my-10 max-w-lg">
+            <p className="text-sm md:text-base my-10 max-w-lg text-justify">
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industrys standard dummy text
               ever since the 1500s, when an unknown printer took a galley of

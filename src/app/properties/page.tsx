@@ -116,7 +116,9 @@ export default function PropertiesPage() {
 
   return (
     <div className="min-h-screen container mx-auto py-8 px-4 md:px-12">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">All Properties</h1>
+      <h1 className="text-2xl md:text-4xl  mb-6 text-gray-900">
+        All Properties
+      </h1>
 
       <div className="flex flex-col justify-between md:flex-row md:items-center gap-4 mb-6">
         {/* Search input with icon */}

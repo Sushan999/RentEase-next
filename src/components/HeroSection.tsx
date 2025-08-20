@@ -1,41 +1,84 @@
 // components/HeroSection.tsx
 import Image from "next/image";
+import { Home, MapPin, Clock } from "lucide-react";
+import Link from "next/link";
+
 export function HeroSection() {
   return (
-    <section className="relative bg-gray-50">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <Image
-          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1973&q=80"
-          alt="Modern apartment buildings and residential complex"
-          fill
-          className="w-full h-full object-cover opacity-40"
-          style={{ objectFit: "cover" }}
-          priority={true}
-        />
-        {/* Make sure to import Image from next/image at the top */}
-        <div className="absolute inset-0 bg-black/40" />
-      </div>
+    <section className="min-h-[90vh] md:min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div className="space-y-4">
+          <h1 className="text-4xl md:text-7xl  text-slate-900 leading-tight">
+            Find Your
+            <span className="block font-medium bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Perfect Home
+            </span>
+          </h1>
+          <p className="text-lg md:text-2xl text-slate-600 max-w-2xl mx-auto  leading-relaxed">
+            Discover exceptional properties in prime locations
+          </p>
+        </div>
+        <Link
+          href="/properties"
+          className="bg-blue-600 text-white rounded-md shadow-md px-8 py-4 hover:bg-blue-800 cursor-pointer "
+        >
+          Get Started
+        </Link>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center h-[80vh] px-6">
-        <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-md">
-          Find Your Dream Home
-        </h1>
-        <p className="mt-4 text-lg md:text-xl text-gray-200 max-w-2xl">
-          Browse, book, and rent apartments, flats, and houses with ease.
-        </p>
+        <div className=" grid-cols-1 sm:grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto hidden md:grid mt-6">
+          <div className="text-center space-y-2">
+            <Home className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+            <div className="text-2xl sm:text-3xl  text-slate-900">1000+</div>
+            <div className="text-sm text-slate-500 uppercase tracking-wide">
+              Properties
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <MapPin className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+            <div className="text-2xl sm:text-3xl  text-slate-900">50+</div>
+            <div className="text-sm text-slate-500 uppercase tracking-wide">
+              Cities
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+            <div className="text-2xl sm:text-3xl  text-slate-900">24/7</div>
+            <div className="text-sm text-slate-500 uppercase tracking-wide">
+              Support
+            </div>
+          </div>
+        </div>
 
-        {/* Search Bar */}
-        <div className="mt-8 flex w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden">
-          <input
-            type="text"
-            placeholder="Search by city or property..."
-            className="flex-1 px-4 py-3 text-gray-800 outline-none"
-          />
-          <button className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium">
-            Search
-          </button>
+        {/* //mobileee ko */}
+        <div className="md:hidden flex justify-between px-4 mt-20">
+          <div className="text-center space-y-2 ">
+            <Home className="w-6 h-6 text-blue-600 mx-auto mb-3" />
+            <div className="text-xl sm:text-3xl  text-slate-900">1000+</div>
+            <div className="text-xs text-slate-500 uppercase tracking-wide">
+              Properties
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <MapPin className="w-6 h-6 text-blue-600 mx-auto mb-3" />
+            <div className="text-xl sm:text-3xl  text-slate-900">50+</div>
+            <div className="text-xs text-slate-500 uppercase tracking-wide">
+              Cities
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <Clock className="w-6 h-6 text-blue-600 mx-auto mb-3" />
+            <div className="text-xl sm:text-3xl  text-slate-900">24/7</div>
+            <div className="text-xs text-slate-500 uppercase tracking-wide">
+              Support
+            </div>
+          </div>
+        </div>
+
+        {/* Subtle scroll indicator */}
+        <div className="pt-16 hidden md:block">
+          <div className="w-6 h-10 border-2 border-slate-300 rounded-full mx-auto relative">
+            <div className="w-1 h-3 bg-slate-400 rounded-full mx-auto mt-2 animate-bounce"></div>
+          </div>
         </div>
       </div>
     </section>
