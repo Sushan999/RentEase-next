@@ -7,7 +7,7 @@ export async function getTopRatedProperties(): Promise<Property[]> {
     where: { approved: "APPROVED" },
     include: { images: true, reviews: true, landlord: true },
     take: 4,
-    orderBy: { createdAt: "desc" }, // or by avg rating
+    orderBy: { createdAt: "desc" }, // or by avg rating//
   });
 
   return propertiesFromDB.map((p) => ({
