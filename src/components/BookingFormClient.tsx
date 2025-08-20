@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BookingFormClientProps } from "@/types/component-props";
 import LoadingSpinner from "./LoadingSpinner";
+import { toast } from "react-toastify";
 
 export default function BookingFormClient({
   propertyId,
@@ -16,7 +17,7 @@ export default function BookingFormClient({
     e.preventDefault();
 
     if (new Date(startDate) > new Date(endDate)) {
-      alert("End date must be after start date");
+      toast.error("End date must be after start date");
       return;
     }
 
@@ -28,16 +29,16 @@ export default function BookingFormClient({
         body: JSON.stringify({ propertyId, startDate, endDate, message }),
       });
       if (res.ok) {
-        alert("Booking submitted successfully!");
+        toast.success("Booking submitted successfully!");
         setStartDate("");
         setEndDate("");
         setMessage("");
       } else {
         const data = await res.json();
-        alert(data.error || "Booking failed. Please try again.");
+        toast.success(data.error || "Booking failed. Please try again.");
       }
     } catch {
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

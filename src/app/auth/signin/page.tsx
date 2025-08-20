@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn, getSession } from "next-auth/react";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, LogIn } from "lucide-react";
@@ -25,21 +26,23 @@ export default function SignIn() {
       });
 
       if (result?.error) {
-        alert("Invalid credentials");
+        toast.error("Invalid credentials");
       } else {
-        alert("Successfully signed in!");
+        toast.success("Successfully signed in!");
         const session = await getSession();
 
-        if (session?.user?.role === "ADMIN") {
-          router.push("/dashboard/admin");
-        } else if (session?.user?.role === "LANDLORD") {
-          router.push("/dashboard/landlord");
-        } else {
-          router.push("/dashboard/tenant");
-        }
+        setTimeout(() => {
+          if (session?.user?.role === "ADMIN") {
+            router.push("/dashboard/admin");
+          } else if (session?.user?.role === "LANDLORD") {
+            router.push("/dashboard/landlord");
+          } else {
+            router.push("/dashboard/tenant");
+          }
+        }, 1200);
       }
     } catch {
-      alert("An error occurred during sign in");
+      toast.error("An error occurred during sign in");
     }
 
     setLoading(false);

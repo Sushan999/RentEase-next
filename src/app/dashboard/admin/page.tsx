@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Property } from "@/types/property";
 import { User } from "@/types/user";
+import { toast } from "react-toastify";
 
 export default function AdminDashboard() {
   const [redirecting, setRedirecting] = useState(false);
@@ -122,7 +123,9 @@ export default function AdminDashboard() {
 
       if (!response.ok) {
         if (response.status === 403) {
-          alert("You don't have permission to update this property status.");
+          toast.error(
+            "You don't have permission to update this property status."
+          );
           return;
         }
         throw new Error("Failed to update property status");
@@ -140,10 +143,10 @@ export default function AdminDashboard() {
         prev.filter((property) => property.id !== id)
       );
 
-      alert(`Property ${status.toLowerCase()} successfully!`);
+      toast.success(`Property ${status.toLowerCase()} successfully!`);
     } catch (err) {
       console.error("Error updating property status:", err);
-      alert("Failed to update status. Please try again.");
+      toast.error("Failed to update status. Please try again.");
     } finally {
       setUpdating(null);
     }
@@ -162,7 +165,7 @@ export default function AdminDashboard() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          alert("You don't have permission to update user status.");
+          ("You don't have permission to update user status.");
           return;
         }
         throw new Error("Failed to update user status");
@@ -175,10 +178,10 @@ export default function AdminDashboard() {
         setUsers(usersData);
       }
 
-      alert(`User ${!blocked ? "blocked" : "unblocked"} successfully!`);
+      toast.success(`User ${!blocked ? "blocked" : "unblocked"} successfully!`);
     } catch (err) {
       console.error("Error updating user status:", err);
-      alert("Failed to update user status. Please try again.");
+      toast.error("Failed to update user status. Please try again.");
     } finally {
       setUpdatingUser(null);
     }
@@ -207,22 +210,6 @@ export default function AdminDashboard() {
       </div>
     );
   }
-
-  // if (error) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-  //       <div className="text-center bg-white p-8 rounded-lg shadow-md">
-  //         <div className="text-red-600 text-xl mb-4">{error}</div>
-  //         <button
-  //           onClick={fetchDashboard}
-  //           className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-  //         >
-  //           Retry
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+import { toast } from "react-toastify";
 type ImageInput = {
   url: string;
   alt?: string;
@@ -80,7 +80,7 @@ export default function AddPropertyForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create property");
 
-      alert("Success");
+      toast.success("Success");
       router.push(`/dashboard/landlord`);
     } catch (err: unknown) {
       if (err instanceof Error) {

@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { Property } from "@/types/property";
 import { Booking } from "@/types/booking";
+import { toast } from "react-toastify";
 
 export default function LandlordDashboard() {
   const { data: session, status } = useSession();
@@ -80,13 +81,13 @@ export default function LandlordDashboard() {
         )
       );
 
-      alert(`Booking ${status.toLowerCase()} successfully!`);
+      toast.success(`Booking ${status.toLowerCase()} successfully!`);
     } catch (err) {
       console.error("Error updating booking:", err);
       if (axios.isAxiosError(err) && err.response?.status === 403) {
-        alert("You don't have permission to update this booking.");
+        toast.error("You don't have permission to update this booking.");
       } else {
-        alert("Failed to update booking. Please try again.");
+        toast.error("Failed to update booking. Please try again.");
       }
     } finally {
       setUpdatingBooking(null);

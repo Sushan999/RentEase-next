@@ -1,21 +1,26 @@
-// app/components/FeaturedSection2.tsx
+// app/components/FeaturedSection.tsx
+
+import Title from "./Title";
 import { prisma } from "@/lib/prisma";
 import PropertyCard from "./PropertyCard";
-import Title from "./Title";
-import Link from "next/link";
 import { Property } from "@/types/property";
-
-export const dynamic = "force-dynamic"; // ensures fresh data
+import Link from "next/link";
 
 export default async function FeaturedSection2() {
+  // Fetch properties server-side
   const propertiesFromDB = await prisma.property.findMany({
     where: { approved: "APPROVED" },
-    include: { images: true, reviews: true, landlord: true },
+    include: {
+      images: true,
+      reviews: true,
+      landlord: true,
+    },
     take: 4,
     orderBy: { createdAt: "desc" },
   });
 
-  const properties: Property[] = propertiesFromDB.map((p) => ({
+  // Map DB data to Property type your PropertyCard expects
+  let properties: Property[] = propertiesFromDB.map((p) => ({
     id: p.id,
     title: p.title,
     location: p.location,
@@ -24,15 +29,20 @@ export default async function FeaturedSection2() {
     bathrooms: p.bathrooms,
     area: p.area,
     propertyType: p.propertyType,
-    images: p.images.map((img) => ({
-      id: img.id,
-      url: img.url,
-      alt: img.alt ?? "",
-    })),
+    images: p.images.map(
+      (img: { id: number; url: string; alt: string | null }) => ({
+        id: img.id,
+        url: img.url,
+        alt: img.alt ?? "",
+      })
+    ),
     rating:
       p.reviews.length > 0
         ? Math.round(
-            (p.reviews.reduce((acc, r) => acc + r.rating, 0) /
+            (p.reviews.reduce(
+              (acc: number, r: { rating: number }) => acc + r.rating,
+              0
+            ) /
               p.reviews.length) *
               10
           ) / 10
@@ -46,7 +56,8 @@ export default async function FeaturedSection2() {
     },
   }));
 
-  properties.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  // Sort by rating descending
+  properties = properties.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 
   return (
     <section className="py-12">

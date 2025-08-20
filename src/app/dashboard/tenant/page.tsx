@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { MapPin, Bed, Bath, Calendar, Star, Eye, Clock } from "lucide-react";
 import { Booking } from "@/types/booking";
+import { toast } from "react-toastify";
 
 export default function TenantDashboard() {
   const { data: session, status } = useSession();
@@ -107,10 +108,10 @@ export default function TenantDashboard() {
         prev.filter((booking) => booking.id !== bookingId)
       );
 
-      alert("Booking cancelled successfully!");
+      toast.success("Booking cancelled successfully!");
     } catch (err) {
       console.error("Error cancelling booking:", err);
-      alert("Failed to cancel booking. Please try again.");
+      toast.error("Failed to cancel booking. Please try again.");
     } finally {
       setUpdating(null);
     }

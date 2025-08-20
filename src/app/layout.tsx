@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ClientLayout from "./ClientLayout";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "RentEase",
@@ -20,6 +22,11 @@ export default function RootLayout({
       <body>
         <ClientLayout>
           <Navbar />
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            style={{ marginTop: "4rem" }}
+          />
           {children}
           <Footer />
         </ClientLayout>

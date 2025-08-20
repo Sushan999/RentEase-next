@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
+import { toast } from "react-toastify";
 
 import { UserRole } from "@prisma/client";
 
@@ -43,13 +44,13 @@ export default function SignUp() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Account created successfully!");
+        toast.success("Account created successfully!");
         router.push("/auth/signin");
       } else {
-        alert(data.error || "An error occurred");
+        toast.error(data.error || "An error occurred");
       }
     } catch {
-      alert("An error occurred during registration");
+      toast.error("An error occurred during registration");
     }
 
     setLoading(false);
