@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BookingFormClientProps } from "@/types/component-props";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function BookingFormClient({
   propertyId,
@@ -13,6 +14,12 @@ export default function BookingFormClient({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (new Date(startDate) > new Date(endDate)) {
+      alert("End date must be after start date");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/bookings", {
@@ -77,7 +84,7 @@ export default function BookingFormClient({
         disabled={loading}
         className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
       >
-        {loading ? "Booking..." : "Book Now"}
+        {loading ? <LoadingSpinner /> : "Book Now"}
       </button>
     </form>
   );

@@ -15,7 +15,31 @@ import {
 } from "lucide-react";
 import BookingForm from "@/components/BookingFormClient";
 import PropertyReviewsClient from "@/components/PropertiesReviewClient";
-import { Property } from "@/types/property";
+
+interface PropertyDetail {
+  id: number;
+  title: string;
+  description: string;
+  location: string;
+  rent: number;
+  bedrooms: number;
+  bathrooms: number;
+  area?: number | null;
+  propertyType: string;
+  amenities?: string | null;
+  availableDate: Date;
+  images: { url: string; alt?: string | null }[];
+  landlord: { id: number; name: string; email: string; phone?: string | null };
+  reviews: {
+    id: number;
+    rating: number;
+    comment?: string | null;
+    createdAt: Date;
+    tenant: { name: string };
+  }[];
+  averageRating: number;
+  totalReviews: number;
+}
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -78,21 +102,14 @@ export default async function PropertyPage({ params }: Props) {
     );
   }
 
-  const property: Property = {
+  const property: PropertyDetail = {
     ...propertyRaw,
     area: propertyRaw.area ?? undefined,
     amenities: propertyRaw.amenities ?? undefined,
-    reviews:
-      propertyRaw.reviews?.map((r) => ({
-        ...r,
-        comment: r.comment ?? undefined,
-        createdAt:
-          r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
-      })) ?? [],
-    createdAt:
-      propertyRaw.createdAt instanceof Date
-        ? propertyRaw.createdAt.toISOString()
-        : propertyRaw.createdAt,
+    reviews: propertyRaw.reviews.map((r) => ({
+      ...r,
+      comment: r.comment ?? undefined,
+    })),
     averageRating:
       propertyRaw.reviews.length > 0
         ? propertyRaw.reviews.reduce((a, b) => a + b.rating, 0) /
@@ -104,24 +121,23 @@ export default async function PropertyPage({ params }: Props) {
   const session = await getServerSession(authOptions);
   const isTenant = session?.user.role === "TENANT";
 
-  const formatDate = (date: Date | string) => {
-    const d = typeof date === "string" ? new Date(date) : date;
-    return d.toLocaleDateString("en-US", {
+  const formatDate = (date: Date) =>
+    new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
 
   const renderStars = (rating: number) =>
     Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={
+        className={`h-5 w-5 ${
           i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
-        }
+        }`}
       />
     ));
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -148,7 +164,7 @@ export default async function PropertyPage({ params }: Props) {
           <div className="md:col-span-2 space-y-6">
             <h1 className="text-2xl md:text-3xl font-bold">{property.title}</h1>
             <div className="flex items-center space-x-2 mt-1">
-              {renderStars(Math.round(property.averageRating ?? 0))}
+              {renderStars(Math.round(property.averageRating))}
               <span className="text-gray-600 text-sm">
                 ({property.totalReviews} reviews)
               </span>
@@ -193,10 +209,10 @@ export default async function PropertyPage({ params }: Props) {
             )}
 
             {/* Reviews */}
-            <PropertyReviewsClient
-              propertyId={Number(property.id)}
+            {/* <PropertyReviewsClient
+              propertyId={property.id}
               canReview={isTenant}
-            />
+            /> */}
           </div>
 
           {/* Booking & Landlord Info */}
@@ -207,14 +223,14 @@ export default async function PropertyPage({ params }: Props) {
               </div>
               <div className="flex items-center text-gray-600 mb-4 text-sm md:text-base">
                 <Calendar className="h-4 w-4 mr-1" />
-                Available from {formatDate(property.availableDate ?? "")}
+                Available from {formatDate(property.availableDate)}
               </div>
 
-              {isTenant && (
+              {/* {isTenant && (
                 <div className="sticky top-4">
                   <BookingForm propertyId={property.id.toString()} />
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Landlord Info */}
@@ -225,13 +241,13 @@ export default async function PropertyPage({ params }: Props) {
               <div className="space-y-2 text-sm md:text-base">
                 <div className="flex items-center">
                   <User className="h-4 w-4 mr-1 text-gray-400" />
-                  {property.landlord?.name}
+                  {property.landlord.name}
                 </div>
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-1 text-gray-400" />
-                  {property.landlord?.email}
+                  {property.landlord.email}
                 </div>
-                {property.landlord?.phone && (
+                {property.landlord.phone && (
                   <div className="flex items-center">
                     <Phone className="h-4 w-4 mr-1 text-gray-400" />
                     {property.landlord.phone}
