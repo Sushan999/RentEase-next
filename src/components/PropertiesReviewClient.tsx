@@ -3,17 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { Star, User } from "lucide-react";
 import { Review } from "@/types/component-props";
+import { PropertiesReviewClientProps } from "@/types/component-props";
 import LoadingSpinner from "./LoadingSpinner";
-
-interface Props {
-  propertyId: number;
-  canReview: boolean;
-}
 
 export default function PropertyReviewsClient({
   propertyId,
-  canReview,
-}: Props) {
+  canSubmit,
+}: PropertiesReviewClientProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -71,7 +67,7 @@ export default function PropertyReviewsClient({
         className={`h-5 w-5 cursor-pointer ${
           i < current ? "text-yellow-400 fill-current" : "text-gray-300"
         }`}
-        onClick={() => canReview && setRating(i + 1)}
+        onClick={() => canSubmit && setRating(i + 1)}
       />
     ));
 
@@ -100,7 +96,7 @@ export default function PropertyReviewsClient({
         ))}
       </div>
 
-      {canReview && (
+      {canSubmit && (
         <div className="space-y-2">
           <h3 className="font-semibold">Submit Your Review</h3>
           <div className="flex">{renderStars(rating)}</div>

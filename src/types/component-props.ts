@@ -4,8 +4,14 @@ export interface PropertyCardProps {
 }
 
 export interface BookingFormClientProps {
-  propertyId: number | string;
+  propertyId: number;
+  canSubmit: boolean;
   className?: string;
+}
+
+export interface PropertiesReviewClientProps {
+  propertyId: number;
+  canSubmit: boolean;
 }
 
 export interface Review {

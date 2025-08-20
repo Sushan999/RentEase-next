@@ -52,7 +52,7 @@ export function HeroSection() {
         </div>
 
         {/* //mobileee ko */}
-        <div className="md:hidden flex justify-between px-4 mt-40">
+        <div className="md:hidden flex justify-between px-4 mt-28">
           <div className="text-center space-y-2 ">
             <Home className="w-6 h-6 text-blue-600 mx-auto mb-3" />
             <div className="text-xl sm:text-3xl  text-slate-900">1000+</div>

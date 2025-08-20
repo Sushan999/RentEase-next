@@ -169,7 +169,13 @@ export default async function PropertyPage({
             )}
 
             {/* Reviews */}
-            {/* <PropertyReviewsClient propertyId={property.id} canReview={true} /> */}
+            <div className="bg-white rounded-lg p-4 md:p-6">
+              <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+              <PropertyReviewsClient
+                propertyId={Number(property.id)}
+                canSubmit={!!session && isTenant}
+              />
+            </div>
           </div>
 
           {/* Booking & Landlord Info */}
@@ -186,7 +192,12 @@ export default async function PropertyPage({
                   : "Not specified"}
               </div>
 
-              {/* <BookingForm propertyId={property.id.toString()} /> */}
+              <div className="mt-4">
+                <BookingFormClient
+                  propertyId={Number(property.id)}
+                  canSubmit={!!session && isTenant}
+                />
+              </div>
             </div>
 
             {/* Landlord Info */}
@@ -223,3 +234,5 @@ export default async function PropertyPage({
     </div>
   );
 }
+import BookingFormClient from "@/components/BookingFormClient";
+import PropertyReviewsClient from "@/components/PropertiesReviewClient";
