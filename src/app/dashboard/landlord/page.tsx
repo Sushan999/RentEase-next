@@ -144,22 +144,6 @@ export default function LandlordDashboard() {
     );
   }
 
-  // if (error) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-  //       <div className="text-center bg-white p-8 rounded-lg shadow-md">
-  //         <div className="text-red-600 text-xl mb-4">{error}</div>
-  //         <button
-  //           onClick={fetchDashboard}
-  //           className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-  //         >
-  //           Retry
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">

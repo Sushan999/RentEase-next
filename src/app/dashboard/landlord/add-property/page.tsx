@@ -27,6 +27,11 @@ export default function AddPropertyForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // sabai ekeichoti
+  const inputStyle =
+    "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm " +
+    "placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
+
   if (!session || session.user.role !== "LANDLORD") {
     return (
       <div className="text-red-600 text-center mt-10">
@@ -75,8 +80,7 @@ export default function AddPropertyForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create property");
 
-      alert("Scuceess");
-      // router.push(`/properties/${data.id}`); // Redirect to property detail
+      alert("Success");
       router.push(`/dashboard/landlord`);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -90,8 +94,8 @@ export default function AddPropertyForm() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto my-10 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+    <div className="max-w-3xl mx-auto my-10 px-4 py-2 bg-white shadow-lg rounded-lg">
+      <h2 className="text-2xl text-center mb-6 text-gray-800">
         Add New Property
       </h2>
 
@@ -103,31 +107,34 @@ export default function AddPropertyForm() {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className={inputStyle}
           required
         />
+
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className={inputStyle}
           required
         />
+
         <input
           type="text"
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className={inputStyle}
           required
         />
+
         <div className="grid grid-cols-2 gap-4">
           <input
             type="number"
             placeholder="Rent"
             value={rent}
             onChange={(e) => setRent(e.target.value)}
-            className="border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className={inputStyle}
             required
           />
           <input
@@ -135,7 +142,7 @@ export default function AddPropertyForm() {
             placeholder="Bedrooms"
             value={bedrooms}
             onChange={(e) => setBedrooms(e.target.value)}
-            className="border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className={inputStyle}
             required
           />
           <input
@@ -143,7 +150,7 @@ export default function AddPropertyForm() {
             placeholder="Bathrooms"
             value={bathrooms}
             onChange={(e) => setBathrooms(e.target.value)}
-            className="border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className={inputStyle}
             required
           />
           <input
@@ -151,35 +158,38 @@ export default function AddPropertyForm() {
             placeholder="Area (sq ft)"
             value={area}
             onChange={(e) => setArea(e.target.value)}
-            className="border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className={inputStyle}
           />
         </div>
 
-        <select
-          value={propertyType}
-          onChange={(e) => setPropertyType(e.target.value)}
-          className="w-full border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-        >
-          <option value="APARTMENT">Apartment</option>
-          <option value="HOUSE">House</option>
-          <option value="STUDIO">Studio</option>
-          <option value="ROOM">Room</option>
-          <option value="VILLA">Villa</option>
-        </select>
+        {/* Property Type & Available Date on the same line */}
+        <div className="grid grid-cols-2 gap-4">
+          <select
+            value={propertyType}
+            onChange={(e) => setPropertyType(e.target.value)}
+            className={inputStyle}
+          >
+            <option value="APARTMENT">Apartment</option>
+            <option value="HOUSE">House</option>
+            <option value="STUDIO">Studio</option>
+            <option value="ROOM">Room</option>
+            <option value="VILLA">Villa</option>
+          </select>
+
+          <input
+            type="date"
+            value={availableDate}
+            onChange={(e) => setAvailableDate(e.target.value)}
+            className={inputStyle}
+            required
+          />
+        </div>
 
         <textarea
           placeholder="Amenities (comma separated)"
           value={amenities}
           onChange={(e) => setAmenities(e.target.value)}
-          className="w-full border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-        />
-
-        <input
-          type="date"
-          value={availableDate}
-          onChange={(e) => setAvailableDate(e.target.value)}
-          className="w-full border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-          required
+          className={inputStyle}
         />
 
         <div>
@@ -193,7 +203,7 @@ export default function AddPropertyForm() {
                 onChange={(e) =>
                   handleImageChange(index, "url", e.target.value)
                 }
-                className="flex-1 border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className={inputStyle}
                 required
               />
               <input
@@ -203,7 +213,7 @@ export default function AddPropertyForm() {
                 onChange={(e) =>
                   handleImageChange(index, "alt", e.target.value)
                 }
-                className="flex-1 border px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className={inputStyle}
               />
               {images.length > 1 && (
                 <button
