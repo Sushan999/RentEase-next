@@ -28,6 +28,10 @@ export async function GET(request: NextRequest) {
       : undefined;
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const sortOrder = searchParams.get("sortOrder") === "desc" ? "desc" : "asc";
+    const limit = searchParams.get("limit")
+      ? parseInt(searchParams.get("limit")!)
+      : undefined;
+    const order = searchParams.get("order") === "asc" ? "asc" : "desc";
     const status = searchParams.get("status") as PropertyStatus | null;
 
     const where: Prisma.PropertyWhereInput = {
@@ -85,8 +89,9 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: {
-        [sortBy]: sortOrder,
+        createdAt: order,
       },
+      take: limit,
     });
 
     // Calculate average rating for each property
