@@ -5,13 +5,9 @@ import { Property } from "@/types/property";
 export async function getTopRatedProperties(): Promise<Property[]> {
   const propertiesFromDB = await prisma.property.findMany({
     where: { approved: "APPROVED" },
-    include: {
-      images: true,
-      reviews: true,
-      landlord: true,
-    },
+    include: { images: true, reviews: true, landlord: true },
     take: 4,
-    orderBy: { createdAt: "desc" }, // optionally sort by rating later
+    orderBy: { createdAt: "desc" }, // or by avg rating
   });
 
   return propertiesFromDB.map((p) => ({

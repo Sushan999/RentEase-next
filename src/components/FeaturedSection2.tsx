@@ -1,30 +1,52 @@
 // app/components/FeaturedSection2.tsx
-"use client";
-
-import { useEffect, useState } from "react";
-import Title from "./Title";
+import { prisma } from "@/lib/prisma";
 import PropertyCard from "./PropertyCard";
+import Title from "./Title";
 import Link from "next/link";
 import { Property } from "@/types/property";
-import { getTopRatedProperties } from "@/lib/serverAction";
 
-export default function FeaturedSection2() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
+export const dynamic = "force-dynamic"; // ensures fresh data
 
-  useEffect(() => {
-    (async () => {
-      const data = await getTopRatedProperties();
-      // Sort by rating descending
-      data.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-      setProperties(data);
-      setLoading(false);
-    })();
-  }, []);
+export default async function FeaturedSection2() {
+  const propertiesFromDB = await prisma.property.findMany({
+    where: { approved: "APPROVED" },
+    include: { images: true, reviews: true, landlord: true },
+    take: 4,
+    orderBy: { createdAt: "desc" },
+  });
 
-  if (loading) {
-    return <p className="text-center py-12">Loading top-rated properties...</p>;
-  }
+  const properties: Property[] = propertiesFromDB.map((p) => ({
+    id: p.id,
+    title: p.title,
+    location: p.location,
+    rent: p.rent,
+    bedrooms: p.bedrooms,
+    bathrooms: p.bathrooms,
+    area: p.area,
+    propertyType: p.propertyType,
+    images: p.images.map((img) => ({
+      id: img.id,
+      url: img.url,
+      alt: img.alt ?? "",
+    })),
+    rating:
+      p.reviews.length > 0
+        ? Math.round(
+            (p.reviews.reduce((acc, r) => acc + r.rating, 0) /
+              p.reviews.length) *
+              10
+          ) / 10
+        : 0,
+    totalReviews: p.reviews.length,
+    approved: p.approved,
+    landlord: {
+      id: p.landlord.id,
+      name: p.landlord.name,
+      email: p.landlord.email,
+    },
+  }));
+
+  properties.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 
   return (
     <section className="py-12">
