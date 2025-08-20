@@ -13,31 +13,7 @@ import {
   Mail,
   User,
 } from "lucide-react";
-
-interface PropertyDetail {
-  id: number;
-  title: string;
-  description: string;
-  location: string;
-  rent: number;
-  bedrooms: number;
-  bathrooms: number;
-  area?: number | null;
-  propertyType: string;
-  amenities?: string | null;
-  availableDate: Date;
-  images: { url: string; alt?: string | null }[];
-  landlord: { id: number; name: string; email: string; phone?: string | null };
-  reviews: {
-    id: number;
-    rating: number;
-    comment?: string | null;
-    createdAt: Date;
-    tenant: { name: string };
-  }[];
-  averageRating: number;
-  totalReviews: number;
-}
+import type { Property } from "@/types/property";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -69,19 +45,36 @@ export default async function PropertyPage({
     notFound();
   }
 
-  const property: PropertyDetail = {
+  const property: Property = {
     ...propertyRaw,
     area: propertyRaw.area ?? undefined,
     amenities: propertyRaw.amenities ?? undefined,
     reviews: propertyRaw.reviews.map((r) => ({
       ...r,
       comment: r.comment ?? undefined,
+      createdAt: r.createdAt.toISOString(),
+      tenant: { name: r.tenant.name },
     })),
+    createdAt: propertyRaw.createdAt.toISOString(),
+    availableDate: propertyRaw.availableDate?.toISOString(),
+    landlord: propertyRaw.landlord
+      ? {
+          id: propertyRaw.landlord.id,
+          name: propertyRaw.landlord.name,
+          email: propertyRaw.landlord.email,
+          phone: propertyRaw.landlord.phone ?? undefined,
+        }
+      : undefined,
     averageRating:
       propertyRaw.reviews.length > 0
         ? propertyRaw.reviews.reduce((a, b) => a + b.rating, 0) /
           propertyRaw.reviews.length
         : 0,
+    rating:
+      propertyRaw.reviews.length > 0
+        ? propertyRaw.reviews.reduce((a, b) => a + b.rating, 0) /
+          propertyRaw.reviews.length
+        : undefined,
     totalReviews: propertyRaw.reviews.length,
   };
 
@@ -131,9 +124,9 @@ export default async function PropertyPage({
           <div className="md:col-span-2 space-y-6">
             <h1 className="text-2xl md:text-3xl font-bold">{property.title}</h1>
             <div className="flex items-center space-x-2 mt-1">
-              {renderStars(Math.round(property.averageRating))}
+              {renderStars(Math.round(property.rating || 0))}
               <span className="text-gray-600 text-sm">
-                ({property.totalReviews} reviews)
+                ({property.totalReviews || 0} reviews)
               </span>
             </div>
 
@@ -187,7 +180,10 @@ export default async function PropertyPage({
               </div>
               <div className="flex items-center text-gray-600 mb-4 text-sm md:text-base">
                 <Calendar className="h-4 w-4 mr-1" />
-                Available from {formatDate(property.availableDate)}
+                Available from{" "}
+                {property.availableDate
+                  ? formatDate(property.availableDate)
+                  : "Not specified"}
               </div>
 
               {/* <BookingForm propertyId={property.id.toString()} /> */}
@@ -198,22 +194,28 @@ export default async function PropertyPage({
               <h3 className="text-lg font-semibold mb-2 md:mb-4">
                 Contact Landlord
               </h3>
-              <div className="space-y-2 text-sm md:text-base">
-                <div className="flex items-center">
-                  <User className="h-4 w-4 mr-1 text-gray-400" />
-                  {property.landlord.name}
-                </div>
-                <div className="flex items-center">
-                  <Mail className="h-4 w-4 mr-1 text-gray-400" />
-                  {property.landlord.email}
-                </div>
-                {property.landlord.phone && (
+              {property.landlord ? (
+                <div className="space-y-2 text-sm md:text-base">
                   <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-1 text-gray-400" />
-                    {property.landlord.phone}
+                    <User className="h-4 w-4 mr-1 text-gray-400" />
+                    {property.landlord.name}
                   </div>
-                )}
-              </div>
+                  <div className="flex items-center">
+                    <Mail className="h-4 w-4 mr-1 text-gray-400" />
+                    {property.landlord.email}
+                  </div>
+                  {property.landlord.phone && (
+                    <div className="flex items-center">
+                      <Phone className="h-4 w-4 mr-1 text-gray-400" />
+                      {property.landlord.phone}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-gray-500">
+                  Landlord information not available
+                </div>
+              )}
             </div>
           </div>
         </div>
