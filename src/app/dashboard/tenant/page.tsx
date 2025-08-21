@@ -1,4 +1,6 @@
 "use client";
+import TenantSummaryCards from "./components/TenantSummaryCards";
+
 import { BookingStats } from "@/types/stats";
 
 import { useEffect, useState } from "react";
@@ -189,38 +191,20 @@ export default function TenantDashboard() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
-          <div className="bg-white rounded-lg p-6 shadow-md border-l-4 border-blue-500">
-            <div className="text-3xl font-bold text-blue-600 mb-1">
-              {stats.total}
-            </div>
-            <div className="text-gray-700 font-medium">Total Bookings</div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-md border-l-4 border-yellow-500">
-            <div className="text-3xl font-bold text-yellow-600 mb-1">
-              {stats.pending}
-            </div>
-            <div className="text-gray-700 font-medium">Pending</div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-md border-l-4 border-green-500">
-            <div className="text-3xl font-bold text-green-600 mb-1">
-              {stats.approved}
-            </div>
-            <div className="text-gray-700 font-medium">Approved</div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-md border-l-4 border-red-500">
-            <div className="text-3xl font-bold text-red-600 mb-1">
-              {stats.rejected}
-            </div>
-            <div className="text-gray-700 font-medium">Rejected</div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-md border-l-4 border-gray-500">
-            <div className="text-3xl font-bold text-gray-600 mb-1">
-              {stats.cancelled}
-            </div>
-            <div className="text-gray-700 font-medium">Cancelled</div>
-          </div>
-        </div>
+        <TenantSummaryCards
+          totalBookings={stats.total}
+          pendingBookings={stats.pending}
+          completedBookings={stats.approved}
+          formatCurrency={(amount) =>
+            amount.toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+            })
+          }
+          totalSpent={bookings
+            .filter((b) => b.status === "APPROVED" || b.status === "COMPLETED")
+            .reduce((sum, b) => sum + b.property.rent, 0)}
+        />
 
         {/* Pending Bookings Section */}
         <div className="bg-white rounded-lg shadow-md mb-8">

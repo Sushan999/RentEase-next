@@ -1,11 +1,10 @@
-// properties/
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PropertyType, PropertyStatus, Prisma } from "@prisma/client";
 
-// GET all properties with search and filters
+// For to get properties with search and filters
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -115,12 +114,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new property (Landlords only)
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== "LANDLORD") {
+      //only landlord will be able to create
       return NextResponse.json(
         { error: "Unauthorized - Landlord access required" },
         { status: 401 }

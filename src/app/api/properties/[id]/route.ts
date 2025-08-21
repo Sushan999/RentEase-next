@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET single property by ID
+// GeT single property by ID for detail pagee
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -62,7 +62,7 @@ export async function GET(
       );
     }
 
-    // Calculate average rating
+    // average rating
     const averageRating =
       property.reviews && property.reviews.length > 0
         ? property.reviews.reduce(
@@ -85,7 +85,7 @@ export async function GET(
   }
 }
 
-// PUT - Update property (Owner or Admin only)
+//  Update property for Owner or Admin
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -109,7 +109,7 @@ export async function PUT(
       );
     }
 
-    // Allow admins to edit any property landlords only their own
+    // Allow admins
     if (
       session.user.role !== "ADMIN" &&
       property.landlordId !== Number(session.user.id)
@@ -137,7 +137,6 @@ export async function PUT(
       approved,
     } = data;
 
-    // Update property
     const updateData: Prisma.PropertyUpdateInput = {
       title,
       description,
@@ -169,9 +168,7 @@ export async function PUT(
       },
     });
 
-    // Handle images update if provided
     if (images) {
-      // Delete existing images
       await prisma.propertyImage.deleteMany({
         where: { propertyId: Number(id) },
       });
@@ -198,7 +195,7 @@ export async function PUT(
   }
 }
 
-// DELETE property (Owner or Admin only)
+// Delete property
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -222,8 +219,6 @@ export async function DELETE(
       );
     }
 
-    // Check if user can delete this property
-
     if (property.landlordId !== Number(session.user.id)) {
       return NextResponse.json(
         { error: "Forbidden - Can only delete your own properties" },
@@ -231,7 +226,6 @@ export async function DELETE(
       );
     }
 
-    // Delete property (CASCADE will handle related records)
     await prisma.property.delete({
       where: { id: Number(id) },
     });

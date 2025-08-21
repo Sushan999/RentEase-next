@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axios from "axios";
+
 type ImageInput = {
   url: string;
   alt?: string;
@@ -148,7 +149,6 @@ export default function AddPropertyForm() {
           />
         </div>
 
-        {/* Property Type & Available Date on the same line */}
         <div className="grid grid-cols-2 gap-4">
           <select
             value={propertyType}

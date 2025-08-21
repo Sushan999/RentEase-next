@@ -103,7 +103,6 @@ model Review {
   @@map("reviews")
 }
 
-// Enums
 enum UserRole {
   LANDLORD
   TENANT
