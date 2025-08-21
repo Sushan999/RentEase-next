@@ -8,7 +8,6 @@ import Image from "next/image";
 export default function PropertyCard({ property }: PropertyCardProps) {
   const mainImage = property.images?.[0]?.url || "/placeholder.png";
 
-  // Ensure rating is rounded and fill color is applied for filled stars
   const renderStars = (rating: number) => {
     const rounded = Math.round(rating || 0);
     return Array.from({ length: 5 }, (_, i) => (
@@ -25,7 +24,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   return (
     <Link href={`/properties/${property.id}`}>
       <div className="group cursor-pointer bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-200 border border-gray-100 shadow-md">
-        {/* Image Container */}
         <div className="relative h-48 overflow-hidden">
           <Image
             src={mainImage}
@@ -37,14 +35,12 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             priority={true}
           />
 
-          {/* Property Type Badge */}
           <div className="absolute top-4 left-4">
             <span className="bg-white/95 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm">
               {property.propertyType}
             </span>
           </div>
 
-          {/* Price Badge */}
           <div className="absolute top-4 right-4">
             <span className="bg-blue-500/80 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
               ${property.rent.toLocaleString()}/month
@@ -52,21 +48,16 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-6">
-          {/* Title */}
           <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
             {property.title}
           </h3>
 
-          {/* Location */}
           <div className="flex items-center text-gray-600 mb-4">
             <MapPin className="h-4 w-4 mr-2 text-gray-400" />
             <span className="text-sm">{property.location}</span>
-            <span className="text-sm">{property.location}</span>
           </div>
 
-          {/* Property Details */}
           <div className="flex items-center  gap-6 text-gray-600 mb-4">
             <div className="flex items-center space-x-1">
               <Bed className="h-4 w-4" />
@@ -86,7 +77,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             )}
           </div>
 
-          {/* Bottom Row */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
             {/* Rating */}
 
@@ -108,7 +98,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
               </span>
             </div>
 
-            {/* Availability Status */}
             <span className="text-blue-600 text-sm font-medium">
               Available Now
             </span>

@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
   try {
     const { name, email, password, role } = await request.json();
 
-    // Basic validation
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -14,7 +13,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // to xheck if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -26,7 +24,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user
@@ -40,7 +37,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create response without password
     return NextResponse.json(
       {
         message: "User created successfully",

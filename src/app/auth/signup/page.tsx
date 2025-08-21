@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
-
 import { UserRole } from "@prisma/client";
+import axios from "axios";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -33,22 +33,9 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success("Account created successfully!");
-        router.push("/auth/signin");
-      } else {
-        toast.error(data.error || "An error occurred");
-      }
+      const { data } = await axios.post("/api/auth/register", formData);
+      toast.success(data.message || "Account created successfully!");
+      router.push("/auth/signin");
     } catch {
       toast.error("An error occurred during registration");
     }

@@ -49,10 +49,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (
-      !session ||
-      (session.user.role !== "LANDLORD" && session.user.role !== "TENANT")
-    ) {
+    if (!session || session.user.role !== "TENANT") {
       return NextResponse.json(
         { error: "Unauthorized - Only Tenant can submit a review" },
         { status: 401 }
@@ -62,7 +59,6 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     const { propertyId, rating, comment } = data;
 
-    // Validate rating
     if (!rating || rating < 1 || rating > 5) {
       return NextResponse.json(
         { error: "Rating must be between 1 and 5" },
@@ -86,7 +82,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if review already exists
     const existingReview = await prisma.review.findUnique({
       where: {
         tenantId_propertyId: {
@@ -103,7 +98,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create review
     const review = await prisma.review.create({
       data: {
         propertyId: Number(propertyId),

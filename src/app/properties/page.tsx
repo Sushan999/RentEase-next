@@ -5,6 +5,7 @@ import { Property } from "@/types/property";
 import PropertyCard from "@/components/PropertyCard";
 import { Filter, Search, ChevronDown } from "lucide-react";
 import { Listbox } from "@headlessui/react";
+import axios from "axios";
 
 const sortOptions = [
   { value: "newest", label: "Newest" },
@@ -22,62 +23,67 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch properties from API
     const fetchProperties = async () => {
-      setLoading(true);
-      const res = await fetch("/api/properties?status=APPROVED");
-      const data = await res.json();
-      // Add rating and review count if reviews exist
-      const mapped: Property[] = data.map(
-        (p: {
-          id: number;
-          title: string;
-          location: string;
-          rent: number;
-          bedrooms: number;
-          bathrooms: number;
-          images: { id: number; url: string; alt?: string }[];
-          reviews?: { rating: number }[] | number;
-          totalReviews?: number;
-          createdAt: string;
-          propertyType: string;
-          approved?: "PENDING" | "APPROVED" | "REJECTED";
-        }) => {
-          const totalReviews =
-            typeof p.totalReviews === "number"
-              ? p.totalReviews
-              : typeof p.reviews === "number"
-              ? p.reviews
-              : Array.isArray(p.reviews)
-              ? p.reviews.length
-              : 0;
-          const rating =
-            totalReviews > 0 && Array.isArray(p.reviews)
-              ? p.reviews.reduce(
-                  (sum: number, r: { rating: number }) => sum + r.rating,
-                  0
-                ) / totalReviews
-              : 0;
-          return {
-            ...p,
-            location: p.location,
-            images: (p.images || []).map(
-              (img: { id: number; url: string; alt?: string }) => ({
+      try {
+        setLoading(true);
+
+        const { data } = await axios.get("/api/properties", {
+          params: { status: "APPROVED" },
+        });
+
+        const mapped: Property[] = data.map(
+          (p: {
+            id: number;
+            title: string;
+            location: string;
+            rent: number;
+            bedrooms: number;
+            bathrooms: number;
+            images: { id: number; url: string; alt?: string }[];
+            reviews?: { rating: number }[] | number;
+            totalReviews?: number;
+            createdAt: string;
+            propertyType: string;
+            approved?: "PENDING" | "APPROVED" | "REJECTED";
+          }) => {
+            const totalReviews =
+              typeof p.totalReviews === "number"
+                ? p.totalReviews
+                : typeof p.reviews === "number"
+                ? p.reviews
+                : Array.isArray(p.reviews)
+                ? p.reviews.length
+                : 0;
+
+            const rating =
+              totalReviews > 0 && Array.isArray(p.reviews)
+                ? p.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+                : 0;
+
+            return {
+              ...p,
+              location: p.location,
+              images: (p.images || []).map((img) => ({
                 id: img.id,
                 url: img.url,
                 alt: img.alt ?? "",
-              })
-            ),
-            rating: Math.round(rating),
-            totalReviews,
-            approved: p.approved ?? "APPROVED",
-            createdAt: p.createdAt,
-          };
-        }
-      );
-      setProperties(mapped);
-      setLoading(false);
+              })),
+              rating: Math.round(rating),
+              totalReviews,
+              approved: p.approved ?? "APPROVED",
+              createdAt: p.createdAt,
+            };
+          }
+        );
+
+        setProperties(mapped);
+      } catch {
+        console.error("Failed to fetch properties:");
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchProperties();
   }, []);
 

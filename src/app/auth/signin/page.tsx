@@ -37,9 +37,9 @@ export default function SignIn() {
           } else if (session?.user?.role === "LANDLORD") {
             router.push("/dashboard/landlord");
           } else {
-            router.push("/dashboard/tenant");
+            router.push("/");
           }
-        }, 1200);
+        }, 1000);
       }
     } catch {
       toast.error("An error occurred during sign in");
