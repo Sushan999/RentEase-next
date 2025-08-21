@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import axios from "axios";
 type ImageInput = {
   url: string;
   alt?: string;
@@ -25,7 +26,6 @@ export default function AddPropertyForm() {
   const [availableDate, setAvailableDate] = useState("");
   const [images, setImages] = useState<ImageInput[]>([{ url: "", alt: "" }]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   // sabai ekeichoti
   const inputStyle =
@@ -56,38 +56,26 @@ export default function AddPropertyForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
-      const res = await fetch("/api/properties", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          description,
-          location,
-          rent,
-          bedrooms,
-          bathrooms,
-          area,
-          propertyType,
-          amenities,
-          availableDate,
-          images,
-        }),
+      const { data } = await axios.post("/api/properties", {
+        title,
+        description,
+        location,
+        rent,
+        bedrooms,
+        bathrooms,
+        area,
+        propertyType,
+        amenities,
+        availableDate,
+        images,
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create property");
 
       toast.success("Success");
       router.push(`/dashboard/landlord`);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred");
-      }
+    } catch {
+      toast.error("An error occured while Creating Property");
     } finally {
       setLoading(false);
     }
@@ -98,8 +86,6 @@ export default function AddPropertyForm() {
       <h2 className="text-2xl text-center mb-6 text-gray-800">
         Add New Property
       </h2>
-
-      {error && <div className="text-red-600 mb-4">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
