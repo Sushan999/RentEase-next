@@ -44,7 +44,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new review (Tenants only)
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

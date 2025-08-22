@@ -109,7 +109,6 @@ export async function PUT(
       );
     }
 
-    // Allow admins
     if (
       session.user.role !== "ADMIN" &&
       property.landlordId !== Number(session.user.id)
@@ -195,7 +194,6 @@ export async function PUT(
   }
 }
 
-// Delete property
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

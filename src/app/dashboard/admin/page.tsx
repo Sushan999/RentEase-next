@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Property } from "@/types/property";
 import { User } from "@/types/user";
 import { toast } from "react-toastify";
@@ -12,42 +13,37 @@ import PendingPropertiesOverview from "./components/PendingPropertiesOverview";
 import AdminSummaryCards from "./components/AdminSummaryCards";
 
 export default function AdminDashboard() {
-  const [redirecting, setRedirecting] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [pendingProperties, setPendingProperties] = useState<Property[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingLoading, setPendingLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<number | null>(null);
   const [updatingUser, setUpdatingUser] = useState<number | null>(null);
 
+  // 🚨 Role-based access control
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.location.pathname.startsWith("/dashboard/admin") &&
-      (error === "Unauthorized" || error === "Failed to load dashboard data")
-    ) {
-      setRedirecting(true);
-      window.location.href = "/unauthorized";
-    }
-  }, [error]);
+    if (status === "loading") return; // wait until session loads
 
-  useEffect(() => {
-    if (!redirecting) {
-      fetchDashboard();
+    if (!session) {
+      router.replace("/unauthorized");
+      return;
     }
-  }, [redirecting]);
 
-  useEffect(() => {
+    if (session.user.role !== "ADMIN") {
+      router.replace("/unauthorized");
+      return;
+    }
+
+    // fetch data once session is confirmed admin
     fetchDashboard();
-  }, []);
-
-  if (redirecting) return null;
+  }, [session, status]);
 
   const fetchDashboard = async () => {
     setLoading(true);
-    setError(null);
     try {
       const [approvedRes, pendingRes, rejectedRes, usersRes] =
         await Promise.all([
@@ -68,7 +64,6 @@ export default function AdminDashboard() {
       setUsers(usersData);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
-      setError("Failed to load dashboard data");
       setAllProperties([]);
       setPendingProperties([]);
       setUsers([]);
@@ -77,7 +72,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Refresh pending properties by re-filtering from all properties
   const refreshPendingProperties = async () => {
     setPendingLoading(true);
     try {
@@ -144,20 +138,18 @@ export default function AdminDashboard() {
     }
   };
 
-  // Calculate stats from all properties
+  // Derived data
   const approvedProperties = allProperties.filter(
     (p) => p.approved === "APPROVED"
   );
   const rejectedProperties = allProperties.filter(
     (p) => p.approved === "REJECTED"
   );
-
-  // Filter users by role
   const adminUsers = users.filter((u) => u.role === "ADMIN");
   const landlordUsers = users.filter((u) => u.role === "LANDLORD");
   const tenantUsers = users.filter((u) => u.role === "TENANT");
 
-  if (loading) {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -191,7 +183,6 @@ export default function AdminDashboard() {
           tenantUsers={tenantUsers.length}
         />
 
-        {/* Pending Properties Section */}
         <PendingPropertiesOverview
           pendingProperties={pendingProperties}
           updating={updating}
@@ -200,14 +191,12 @@ export default function AdminDashboard() {
           refreshPendingProperties={refreshPendingProperties}
         />
 
-        {/* Users Management Section */}
         <UserManagementOverview
           users={users}
           updatingUser={updatingUser}
           handleToggleBlockUser={handleToggleBlockUser}
         />
 
-        {/* All Properties History */}
         <PropertiesHistoryOverview
           properties={allProperties}
           updating={updating}

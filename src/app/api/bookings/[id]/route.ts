@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BookingStatus } from "@prisma/client";
 
-// To Update booking status (Landlord or Admin only)
+// To Update booking status
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,7 +16,6 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Await the params since they're now a Promise
     const { id } = await params;
 
     const booking = await prisma.booking.findUnique({
@@ -51,7 +50,6 @@ export async function PUT(
     const data = await request.json();
     const { status } = data;
 
-    // Validate status transition
     const validStatuses = Object.values(BookingStatus);
     if (!validStatuses.includes(status)) {
       return NextResponse.json(
@@ -99,7 +97,7 @@ export async function PUT(
   }
 }
 
-// DELETE booking (Tenant or Admin only)
+// DELETE booking
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -111,7 +109,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Await the params since they're now a Promise
     const { id } = await params;
 
     const booking = await prisma.booking.findUnique({
@@ -122,7 +119,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    // Check permissions (tenant can only delete their own bookings)
     const canDelete =
       session.user.role === "ADMIN" ||
       booking.tenantId === Number(session.user.id);

@@ -35,9 +35,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Rent<span className="text-blue-700">Ease</span>
-              </h1>
+              <img src="logo.png" className="w-22" alt="" />
             </Link>
           </div>
 
