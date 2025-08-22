@@ -26,9 +26,8 @@ export default function AdminDashboard() {
   const [updating, setUpdating] = useState<number | null>(null);
   const [updatingUser, setUpdatingUser] = useState<number | null>(null);
 
-  // 🚨 Role-based access control
   useEffect(() => {
-    if (status === "loading") return; // wait until session loads
+    if (status === "loading") return;
 
     if (!session) {
       router.replace("/unauthorized");
@@ -40,7 +39,6 @@ export default function AdminDashboard() {
       return;
     }
 
-    // fetch data once session is confirmed admin
     fetchDashboard();
   }, [session, status]);
 
