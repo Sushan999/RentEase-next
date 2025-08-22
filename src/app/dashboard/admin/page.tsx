@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Property } from "@/types/property";
+import { Booking } from "@/types/booking";
 import { User } from "@/types/user";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -19,6 +20,7 @@ export default function AdminDashboard() {
   const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [pendingProperties, setPendingProperties] = useState<Property[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingLoading, setPendingLoading] = useState(false);
   const [updating, setUpdating] = useState<number | null>(null);
@@ -45,28 +47,32 @@ export default function AdminDashboard() {
   const fetchDashboard = async () => {
     setLoading(true);
     try {
-      const [approvedRes, pendingRes, rejectedRes, usersRes] =
+      const [approvedRes, pendingRes, rejectedRes, usersRes, bookingsRes] =
         await Promise.all([
           axios.get("/api/properties"),
           axios.get("/api/properties?status=PENDING"),
           axios.get("/api/properties?status=REJECTED"),
           axios.get("/api/users"),
+          axios.get("/api/bookings"),
         ]);
 
       const approvedData = approvedRes.data;
       const pendingData = pendingRes.data;
       const rejectedData = rejectedRes.data;
       const usersData = usersRes.data;
+      const bookingsData = bookingsRes.data;
 
       const allProps = [...approvedData, ...pendingData, ...rejectedData];
       setAllProperties(allProps);
       setPendingProperties(pendingData);
       setUsers(usersData);
+      setAllBookings(bookingsData);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setAllProperties([]);
       setPendingProperties([]);
       setUsers([]);
+      setAllBookings([]);
     } finally {
       setLoading(false);
     }
@@ -199,6 +205,7 @@ export default function AdminDashboard() {
 
         <PropertiesHistoryOverview
           properties={allProperties}
+          bookings={allBookings}
           updating={updating}
           handleUpdateStatus={handleUpdateStatus}
         />

@@ -208,6 +208,9 @@ export async function DELETE(
 
     const property = await prisma.property.findUnique({
       where: { id: Number(id) },
+      include: {
+        bookings: true,
+      },
     });
 
     if (!property) {
@@ -217,10 +220,31 @@ export async function DELETE(
       );
     }
 
-    if (property.landlordId !== Number(session.user.id)) {
+    if (
+      session.user.role !== "ADMIN" &&
+      property.landlordId !== Number(session.user.id)
+    ) {
       return NextResponse.json(
         { error: "Forbidden - Can only delete your own properties" },
         { status: 403 }
+      );
+    }
+
+    if (property.approved !== "APPROVED") {
+      return NextResponse.json(
+        { error: "Only approved properties can be deleted" },
+        { status: 400 }
+      );
+    }
+
+    // Don't allow delete if any booking is pending
+    const hasPendingBooking = property.bookings?.some(
+      (b: { status: string }) => b.status === "PENDING"
+    );
+    if (hasPendingBooking) {
+      return NextResponse.json(
+        { error: "Cannot delete property with pending bookings" },
+        { status: 400 }
       );
     }
 

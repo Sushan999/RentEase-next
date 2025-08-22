@@ -54,6 +54,7 @@ export default async function PropertyPage({
       comment: r.comment ?? undefined,
       createdAt: r.createdAt.toISOString(),
       tenant: { name: r.tenant.name },
+      tenantId: r.tenantId,
     })),
     createdAt: propertyRaw.createdAt.toISOString(),
     availableDate: propertyRaw.availableDate?.toISOString(),

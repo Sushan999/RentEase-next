@@ -40,6 +40,9 @@ const PendingRequestsOverview: React.FC<PendingRequestsOverviewProps> = ({
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Image
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tenant
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -59,6 +62,21 @@ const PendingRequestsOverview: React.FC<PendingRequestsOverviewProps> = ({
             <tbody className="bg-white divide-y divide-gray-200">
               {pendingBookings.map((booking) => (
                 <tr key={booking.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {booking.property?.images &&
+                    booking.property.images.length > 0 ? (
+                      <img
+                        src={booking.property.images[0].url}
+                        alt={booking.property.title}
+                        className="h-12 w-12 rounded-lg object-cover"
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">No img</span>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
                       {booking.tenant?.name}

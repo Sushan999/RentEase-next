@@ -135,12 +135,53 @@ export default function PropertiesOverview({
                       >
                         View
                       </a>
-                      <a
-                        href={`/properties/${property.id}/edit`}
-                        className="bg-gray-600 text-white px-3 py-1 rounded-md hover:bg-gray-700 transition-colors text-xs"
+                      <button
+                        className={`bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors text-xs ${
+                          property.approved === "APPROVED" &&
+                          bookings.filter(
+                            (b) =>
+                              b.property.id === property.id &&
+                              b.status === "PENDING"
+                          ).length === 0
+                            ? ""
+                            : "opacity-50 cursor-not-allowed"
+                        }`}
+                        disabled={
+                          !(
+                            property.approved === "APPROVED" &&
+                            bookings.filter(
+                              (b) =>
+                                b.property.id === property.id &&
+                                b.status === "PENDING"
+                            ).length === 0
+                          )
+                        }
+                        onClick={async () => {
+                          if (
+                            !confirm(
+                              "Are you sure you want to delete this property?"
+                            )
+                          )
+                            return;
+                          try {
+                            const res = await fetch(
+                              `/api/properties/${property.id}`,
+                              {
+                                method: "DELETE",
+                              }
+                            );
+                            if (!res.ok) {
+                              alert("Failed to delete property");
+                              return;
+                            }
+                            window.location.reload();
+                          } catch {
+                            alert("Error deleting property");
+                          }
+                        }}
                       >
-                        Edit
-                      </a>
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET reviews for a property
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -125,6 +124,49 @@ export async function POST(request: NextRequest) {
     console.error("Error creating review:", error);
     return NextResponse.json(
       { error: "Failed to create review" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "TENANT") {
+      return NextResponse.json(
+        { error: "Unauthorized - Only Tenant can delete a review" },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const reviewId = searchParams.get("reviewId");
+    if (!reviewId) {
+      return NextResponse.json(
+        { error: "Review ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Only allow tenant to delete their own review
+    const review = await prisma.review.findUnique({
+      where: { id: Number(reviewId) },
+    });
+    if (!review || review.tenantId !== Number(session.user.id)) {
+      return NextResponse.json(
+        { error: "Review not found or not owned by tenant" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.review.delete({
+      where: { id: Number(reviewId) },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    return NextResponse.json(
+      { error: "Failed to delete review" },
       { status: 500 }
     );
   }

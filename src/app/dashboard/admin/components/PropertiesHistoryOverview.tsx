@@ -2,14 +2,18 @@ import React from "react";
 import Image from "next/image";
 import { Property } from "@/types/property";
 
+import { Booking } from "@/types/booking";
+
 interface PropertiesHistoryOverviewProps {
   properties: Property[];
+  bookings: Booking[];
   updating: number | null;
   handleUpdateStatus: (id: number, status: "APPROVED" | "REJECTED") => void;
 }
 
 const PropertiesHistoryOverview: React.FC<PropertiesHistoryOverviewProps> = ({
   properties,
+  bookings,
   updating,
   handleUpdateStatus,
 }) => {
@@ -135,6 +139,53 @@ const PropertiesHistoryOverview: React.FC<PropertiesHistoryOverviewProps> = ({
                       >
                         View
                       </a>
+                      <button
+                        className={`bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors text-xs ${
+                          property.approved === "APPROVED" &&
+                          bookings.filter(
+                            (b) =>
+                              b.property.id === property.id &&
+                              b.status === "PENDING"
+                          ).length === 0
+                            ? ""
+                            : "opacity-50 cursor-not-allowed"
+                        }`}
+                        disabled={
+                          !(
+                            property.approved === "APPROVED" &&
+                            bookings.filter(
+                              (b) =>
+                                b.property.id === property.id &&
+                                b.status === "PENDING"
+                            ).length === 0
+                          )
+                        }
+                        onClick={async () => {
+                          if (
+                            !confirm(
+                              "Are you sure you want to delete this property?"
+                            )
+                          )
+                            return;
+                          try {
+                            const res = await fetch(
+                              `/api/properties/${property.id}`,
+                              {
+                                method: "DELETE",
+                              }
+                            );
+                            if (!res.ok) {
+                              alert("Failed to delete property");
+                              return;
+                            }
+                            window.location.reload();
+                          } catch {
+                            alert("Error deleting property");
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>
