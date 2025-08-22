@@ -31,11 +31,11 @@ export default function Navbar() {
   return (
     <nav className="bg-white/90 border-gray-800 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-10 lg:px-16">
-        <div className="flex justify-between py-2 md:py-3">
+        <div className="flex justify-between py-2">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <img src="logo.png" className="w-22" alt="" />
+              <img src="logo.png" alt="" className="w-24 object-cover" />
             </Link>
           </div>
 
