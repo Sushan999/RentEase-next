@@ -12,6 +12,7 @@ import LandlordSummaryCards from "./components/LandlordSummaryCards";
 import PendingRequestsOverview from "./components/PendingRequestsOverview";
 import AllBookingsHistoryOverview from "./components/AllBookingsHistoryOverview";
 import PropertiesOverview from "./components/PropertiesOverview";
+import Link from "next/link";
 
 export default function LandlordDashboard() {
   const { data: session, status } = useSession();
@@ -123,12 +124,24 @@ export default function LandlordDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-6">
-        <h1 className="text-2xl md:text-4xl text-gray-900 mb-2">
-          Landlord Dashboard
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Manage your properties and bookings
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl md:text-4xl text-gray-900 mb-2">
+              Landlord Dashboard
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Manage your properties and bookings
+            </p>
+          </div>
+          <div>
+            <Link
+              href="/dashboard/landlord/add-property"
+              className="px-8 py-4 bg-blue-600 hover:bg-blue-800 cursor-pointer rounded-md text-white"
+            >
+              Add Property
+            </Link>
+          </div>
+        </div>
 
         <LandlordSummaryCards
           totalProperties={totalProperties}

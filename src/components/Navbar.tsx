@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, Home, User, LogOut, Settings } from "lucide-react";
 import { UserRole } from "@prisma/client";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,13 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <img src="logo.png" alt="" className="w-24 object-cover" />
+              <Image
+                src="/logo.png"
+                alt="RentEase"
+                width={90}
+                height={90}
+                className="object-cover"
+              />
             </Link>
           </div>
 

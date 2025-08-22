@@ -7,7 +7,7 @@ import { BookingStatus } from "@prisma/client";
 // Gett bookings based on user role
 export async function GET(request: NextRequest) {
   try {
-    // Complete bookings whose endDate has passed and status is APPROVED
+    // Complete booking
     await prisma.booking.updateMany({
       where: {
         status: "APPROVED",
