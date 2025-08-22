@@ -1,5 +1,7 @@
 import React from "react";
-import { Booking } from "../../../../types/booking";
+import { Booking } from "@/types/booking";
+import { MapPin } from "lucide-react";
+import Image from "next/image";
 
 interface AllBookingsHistoryOverviewProps {
   bookings: Booking[];
@@ -16,15 +18,17 @@ const AllBookingsHistoryOverview: React.FC<AllBookingsHistoryOverviewProps> = ({
     <div className="bg-white rounded-lg shadow-md mb-8">
       <div className="px-6 py-4 border-b border-gray-200">
         <h2 className="text-2xl font-semibold text-gray-900">
-          All Bookings History ({bookings.length})
+          Booking History ({bookings.length})
         </h2>
-        <p className="text-gray-600 mt-1">Your complete booking history</p>
+        <p className="text-gray-600 mt-1">
+          Complete history of all your booking applications
+        </p>
       </div>
       {bookings.length === 0 ? (
         <div className="px-6 py-8 text-center">
-          <div className="text-gray-500 text-lg">No bookings found</div>
+          <div className="text-gray-500 text-lg">No bookings yet</div>
           <div className="text-gray-400 text-sm mt-1">
-            Start booking your next stay!
+            Start browsing properties to make your first booking!
           </div>
         </div>
       ) : (
@@ -44,20 +48,60 @@ const AllBookingsHistoryOverview: React.FC<AllBookingsHistoryOverviewProps> = ({
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Applied
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {bookings.map((booking) => (
-                <tr key={booking.id}>
+                <tr key={booking.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {booking.property.title}
+                    <div className="flex items-center">
+                      {booking.property.images &&
+                      booking.property.images.length > 0 ? (
+                        <Image
+                          src={booking.property.images[0].url}
+                          alt={booking.property.title}
+                          width={48}
+                          height={48}
+                          className="h-12 w-12 rounded-lg object-cover mr-4"
+                          style={{ objectFit: "cover" }}
+                          priority={true}
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">
+                          <span className="text-gray-400 text-xs">No img</span>
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {booking.property.title}
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          {booking.property.location}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {booking.property.bedrooms} bed •{" "}
+                          {booking.property.bathrooms} bath •{" "}
+                          {booking.property.propertyType}
+                        </div>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {formatDate(booking.startDate)} -{" "}
-                    {formatDate(booking.endDate)}
+                    <div className="text-sm text-gray-900">
+                      {formatDate(booking.startDate)}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      to {formatDate(booking.endDate)}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {formatCurrency(booking.property.rent)}
+                    <div className="text-sm font-medium text-gray-900">
+                      {formatCurrency(booking.property.rent)} / month
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
@@ -71,6 +115,9 @@ const AllBookingsHistoryOverview: React.FC<AllBookingsHistoryOverviewProps> = ({
                     >
                       {booking.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(booking.createdAt)}
                   </td>
                 </tr>
               ))}

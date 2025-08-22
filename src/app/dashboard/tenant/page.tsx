@@ -1,5 +1,7 @@
 "use client";
 import TenantSummaryCards from "./components/TenantSummaryCards";
+import TenantPendingOverview from "./components/TenantPendingOverview";
+import AllBookingsHistoryOverview from "./components/AllBookingsHistoryOverview";
 
 import { BookingStats } from "@/types/stats";
 
@@ -126,6 +128,7 @@ export default function TenantDashboard() {
     approved: bookings.filter((b) => b.status === "APPROVED").length,
     rejected: bookings.filter((b) => b.status === "REJECTED").length,
     cancelled: bookings.filter((b) => b.status === "CANCELLED").length,
+    completed: bookings.filter((b) => b.status === "COMPLETED").length,
   };
 
   const formatDate = (dateString: string) => {
@@ -194,7 +197,7 @@ export default function TenantDashboard() {
         <TenantSummaryCards
           totalBookings={stats.total}
           pendingBookings={stats.pending}
-          completedBookings={stats.approved}
+          approvedBookings={stats.approved}
           formatCurrency={(amount) =>
             amount.toLocaleString("en-US", {
               style: "currency",
@@ -207,260 +210,24 @@ export default function TenantDashboard() {
         />
 
         {/* Pending Bookings Section */}
-        <div className="bg-white rounded-lg shadow-md mb-8">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">
-                Pending Applications ({stats.pending})
-              </h2>
-              <p className="text-gray-600 mt-1">
-                Bookings awaiting landlord approval
-              </p>
-            </div>
-            <button
-              onClick={fetchBookings}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
-            >
-              Refresh
-            </button>
-          </div>
-
-          {pendingBookings.length === 0 ? (
-            <div className="px-6 py-8 text-center">
-              <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <div className="text-gray-500 text-lg">
-                No pending applications
-              </div>
-              <div className="text-gray-400 text-sm mt-1">
-                Your applications will appear here once submitted
-              </div>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {pendingBookings.map((booking) => (
-                <div key={booking.id} className="p-6 hover:bg-gray-50">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between">
-                    <div className="flex items-start space-x-4">
-                      {booking.property.images.length > 0 ? (
-                        <Image
-                          src={booking.property.images[0].url}
-                          alt={booking.property.title}
-                          width={64}
-                          height={64}
-                          className="w-16 h-16 rounded-lg object-cover"
-                          style={{ objectFit: "cover" }}
-                          priority={true}
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
-                          <span className="text-gray-400 text-xs">No img</span>
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {booking.property.title}
-                        </h3>
-                        <div className="flex items-center text-gray-600 text-sm mt-1">
-                          <MapPin className="h-4 w-4 mr-1" />
-                          {booking.property.location}
-                        </div>
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <Bed className="h-4 w-4 mr-1" />
-                            {booking.property.bedrooms} beds
-                          </div>
-                          <div className="flex items-center">
-                            <Bath className="h-4 w-4 mr-1" />
-                            {booking.property.bathrooms} baths
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            {formatDate(booking.startDate)} -{" "}
-                            {formatDate(booking.endDate)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-4 md:mt-0 md:text-right">
-                      <div className="text-xl font-bold text-blue-600 mb-2">
-                        $
-                        {typeof booking.property.rent === "number"
-                          ? booking.property.rent.toLocaleString()
-                          : "0"}{" "}
-                        / month
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleCancelBooking(booking.id)}
-                          disabled={updating === booking.id}
-                          className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {updating === booking.id ? "Cancelling..." : "Cancel"}
-                        </button>
-                        <a
-                          href={`/properties/${booking.property.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors text-sm inline-flex items-center"
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <TenantPendingOverview
+          bookings={bookings}
+          formatDate={formatDate}
+          handleCancelBooking={handleCancelBooking}
+          updating={updating}
+        />
 
         {/* All Bookings History */}
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Booking History ({stats.total})
-            </h2>
-            <p className="text-gray-600 mt-1">
-              Complete history of all your booking applications
-            </p>
-          </div>
-
-          {bookings.length === 0 ? (
-            <div className="px-6 py-8 text-center">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <div className="text-gray-500 text-lg">No bookings yet</div>
-              <div className="text-gray-400 text-sm mt-1">
-                Start browsing properties to make your first booking!
-              </div>
-              <Link
-                href="/properties"
-                className="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Browse Properties
-              </Link>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Property
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Dates
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Applied
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {bookings.map((booking) => (
-                    <tr key={booking.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {booking.property.images.length > 0 ? (
-                            <Image
-                              src={booking.property.images[0].url}
-                              alt={booking.property.title}
-                              width={48}
-                              height={48}
-                              className="h-12 w-12 rounded-lg object-cover mr-4"
-                              style={{ objectFit: "cover" }}
-                              priority={true}
-                            />
-                          ) : (
-                            <div className="h-12 w-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">
-                              <span className="text-gray-400 text-xs">
-                                No img
-                              </span>
-                            </div>
-                          )}
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {booking.property.title}
-                            </div>
-                            <div className="text-sm text-gray-500 flex items-center">
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {booking.property.location}
-                            </div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              {booking.property.bedrooms}bed •{" "}
-                              {booking.property.bathrooms}bath •{" "}
-                              {booking.property.propertyType}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {formatDate(booking.startDate)}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          to {formatDate(booking.endDate)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          $
-                          {typeof booking.property.rent === "number"
-                            ? booking.property.rent.toLocaleString()
-                            : "0"}{" "}
-                          / month
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                            booking.status
-                          )}`}
-                        >
-                          {booking.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(booking.createdAt)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex gap-2">
-                          {booking.status === "PENDING" && (
-                            <button
-                              onClick={() => handleCancelBooking(booking.id)}
-                              disabled={updating === booking.id}
-                              className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {updating === booking.id ? "..." : "Cancel"}
-                            </button>
-                          )}
-                          <a
-                            href={`/properties/${booking.property.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors text-xs inline-flex items-center"
-                          >
-                            <Eye className="h-3 w-3 mr-1" />
-                            View
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <AllBookingsHistoryOverview
+          bookings={bookings}
+          formatDate={formatDate}
+          formatCurrency={(amount) =>
+            amount.toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+            })
+          }
+        />
 
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow-md p-6">

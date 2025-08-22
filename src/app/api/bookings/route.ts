@@ -7,6 +7,17 @@ import { BookingStatus } from "@prisma/client";
 // Gett bookings based on user role
 export async function GET(request: NextRequest) {
   try {
+    // Auto-complete bookings whose endDate has passed and status is APPROVED
+    await prisma.booking.updateMany({
+      where: {
+        status: "APPROVED",
+        endDate: { lt: new Date() },
+      },
+      data: {
+        status: "COMPLETED",
+      },
+    });
+
     const session = await getServerSession(authOptions);
 
     if (!session) {
