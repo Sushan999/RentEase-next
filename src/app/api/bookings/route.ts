@@ -7,7 +7,7 @@ import { BookingStatus } from "@prisma/client";
 // Gett bookings based on user role
 export async function GET(request: NextRequest) {
   try {
-    // Auto-complete bookings whose endDate has passed and status is APPROVED
+    // Complete bookings whose endDate has passed and status is APPROVED
     await prisma.booking.updateMany({
       where: {
         status: "APPROVED",
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-//  Create new booking (Tenants only)
+//  Create new booking
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -122,7 +122,6 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     const { propertyId, startDate, endDate, message } = data;
 
-    // Check if tenant already has a pending booking for this property
     const existingPending = await prisma.booking.findFirst({
       where: {
         propertyId: Number(propertyId),
@@ -137,7 +136,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if property exists and is available
     const property = await prisma.property.findUnique({
       where: { id: Number(propertyId) },
       include: {
@@ -196,7 +194,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create booking
     const booking = await prisma.booking.create({
       data: {
         propertyId: Number(propertyId),

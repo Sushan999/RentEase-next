@@ -20,4 +20,5 @@ export interface Review {
   comment?: string | null;
   createdAt: string | Date;
   tenant: { name: string };
+  tenantId: number;
 }

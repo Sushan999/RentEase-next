@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== "LANDLORD") {
-      //only landlord will be able to create
+      //only landlord will be albe to create
       return NextResponse.json(
         { error: "Unauthorized - Landlord access required" },
         { status: 401 }
@@ -141,7 +141,6 @@ export async function POST(request: NextRequest) {
       images,
     } = data;
 
-    // Create property
     const property = await prisma.property.create({
       data: {
         title,

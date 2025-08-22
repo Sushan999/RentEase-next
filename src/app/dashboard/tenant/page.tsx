@@ -206,7 +206,15 @@ export default function TenantDashboard() {
           }
           totalSpent={bookings
             .filter((b) => b.status === "APPROVED" || b.status === "COMPLETED")
-            .reduce((sum, b) => sum + b.property.rent, 0)}
+            .reduce((sum, b) => {
+              const days = Math.ceil(
+                (new Date(b.endDate).getTime() -
+                  new Date(b.startDate).getTime()) /
+                  (1000 * 60 * 60 * 24)
+              );
+              const monthlyRent = b.property.rent;
+              return sum + (monthlyRent * days) / 30;
+            }, 0)}
         />
 
         {/* Pending Bookings Section */}

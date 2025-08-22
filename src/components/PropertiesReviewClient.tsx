@@ -1,15 +1,32 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Star, User } from "lucide-react";
+import { Star, User, Trash2 } from "lucide-react";
 import { Review } from "@/types/component-props";
 import { PropertiesReviewClientProps } from "@/types/component-props";
 import LoadingSpinner from "./LoadingSpinner";
+import { useSession } from "next-auth/react";
 
 export default function PropertyReviewsClient({
   propertyId,
   canSubmit,
 }: PropertiesReviewClientProps) {
+  const { data: session } = useSession();
+  const handleDeleteReview = async (reviewId: number) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+    try {
+      const res = await fetch(`/api/reviews?reviewId=${reviewId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        alert("Failed to delete review");
+        return;
+      }
+      fetchReviews();
+    } catch (error) {
+      alert("Error deleting review");
+    }
+  };
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -88,6 +105,16 @@ export default function PropertyReviewsClient({
               <span className="text-gray-500">
                 ({new Date(review.createdAt).toLocaleDateString()})
               </span>
+              {session?.user?.id &&
+                review.tenantId === Number(session.user.id) && (
+                  <button
+                    className="ml-2 text-red-500 hover:text-red-700"
+                    title="Delete Review"
+                    onClick={() => handleDeleteReview(review.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
             </div>
             <div className="flex mt-1">{renderStars(review.rating)}</div>
             {review.comment && (

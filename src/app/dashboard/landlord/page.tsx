@@ -1,43 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { useSession } from "next-auth/react";
-import AllBookingsHistoryOverview from "./components/AllBookingsHistoryOverview";
-import LandlordSummaryCards from "./components/LandlordSummaryCards";
-import PendingRequestsOverview from "./components/PendingRequestsOverview";
-import PropertiesOverview from "./components/PropertiesOverview";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 import { Property } from "@/types/property";
 import { Booking } from "@/types/booking";
-import { toast } from "react-toastify";
-import axios from "axios";
+
+import LandlordSummaryCards from "./components/LandlordSummaryCards";
+import PendingRequestsOverview from "./components/PendingRequestsOverview";
+import AllBookingsHistoryOverview from "./components/AllBookingsHistoryOverview";
+import PropertiesOverview from "./components/PropertiesOverview";
 
 export default function LandlordDashboard() {
   const { data: session, status } = useSession();
-  const [redirecting, setRedirecting] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingBooking, setUpdatingBooking] = useState<number | null>(null);
 
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      status === "authenticated" &&
-      session?.user?.role !== "LANDLORD"
-    ) {
-      setRedirecting(true);
+    if (status === "loading") return;
+    if (!session || session.user.role !== "LANDLORD") {
       window.location.href = "/unauthorized";
     }
-  }, [status, session]);
+  }, [session, status]);
 
   useEffect(() => {
-    if (!redirecting) {
+    if (status === "authenticated" && session?.user.role === "LANDLORD") {
       fetchDashboard();
     }
-  }, [redirecting]);
-
-  if (redirecting) return null;
+  }, [status, session]);
 
   const fetchDashboard = async () => {
     setLoading(true);
@@ -48,16 +42,18 @@ export default function LandlordDashboard() {
       ]);
       setProperties(propertiesRes.data);
       setBookings(bookingsRes.data);
+      console.log("Bookings after approval:", bookingsRes.data);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setProperties([]);
       setBookings([]);
+      toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
   };
 
-  // Utility functions
+  // Formatters
   const formatCurrency = (amount: number) =>
     amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
   const formatDate = (dateString: string) =>
@@ -75,41 +71,34 @@ export default function LandlordDashboard() {
     setUpdatingBooking(bookingId);
     try {
       await axios.put(`/api/bookings/${bookingId}`, { status });
-      setBookings((prev) =>
-        prev.map((booking) =>
-          booking.id === bookingId ? { ...booking, status } : booking
-        )
-      );
+      // Re-fetch bookings to ensure revenue and state are up-to-date
+      const bookingsRes = await axios.get("/api/bookings");
+      setBookings(bookingsRes.data);
       toast.success(`Booking ${status.toLowerCase()} successfully!`);
     } catch (err) {
       console.error("Error updating booking:", err);
-      if (axios.isAxiosError(err) && err.response?.status === 403) {
-        toast.error("You don't have permission to update this booking.");
-      } else {
-        toast.error("Failed to update booking. Please try again.");
-      }
+      toast.error("Failed to update booking");
     } finally {
       setUpdatingBooking(null);
     }
   };
 
-  // Calculate statistics
+  // Stats
   const totalProperties = properties.length;
   const pendingProperties = properties.filter(
-    (p: Property) => p.approved === "PENDING"
+    (p) => p.approved === "PENDING"
   ).length;
   const approvedProperties = properties.filter(
-    (p: Property) => p.approved === "APPROVED"
+    (p) => p.approved === "APPROVED"
   ).length;
   const totalBookings = bookings.length;
-  const pendingBookings = bookings.filter(
-    (b: Booking) => b.status === "PENDING"
-  ).length;
+  const pendingBookings = bookings.filter((b) => b.status === "PENDING").length;
   const approvedBookings = bookings.filter(
-    (b: Booking) => b.status === "APPROVED"
+    (b) => b.status === "APPROVED"
   ).length;
+  console.log("Bookings for revenue calculation:", bookings);
   const totalRevenue = bookings
-    .filter((b: Booking) => b.status === "APPROVED" || b.status === "COMPLETED")
+    .filter((b) => ["APPROVED", "COMPLETED"].includes(b.status))
     .reduce((sum, booking) => {
       const days = Math.ceil(
         (new Date(booking.endDate).getTime() -
@@ -120,7 +109,7 @@ export default function LandlordDashboard() {
       return sum + (monthlyRent * days) / 30;
     }, 0);
 
-  if (loading) {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -134,14 +123,12 @@ export default function LandlordDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-6">
-        <div className="mb-4">
-          <h1 className="text-2xl md:text-4xl text-gray-900 ">
-            Landlord Dashboard
-          </h1>
-          <p className="text-gray-600">Manage your properties and bookings</p>
-        </div>
-
-        {/* Summary Cards */}
+        <h1 className="text-2xl md:text-4xl text-gray-900 mb-2">
+          Landlord Dashboard
+        </h1>
+        <p className="text-gray-600 mb-6">
+          Manage your properties and bookings
+        </p>
 
         <LandlordSummaryCards
           totalProperties={totalProperties}
@@ -154,7 +141,6 @@ export default function LandlordDashboard() {
           formatCurrency={formatCurrency}
         />
 
-        {/* Pending Requests Overview */}
         <PendingRequestsOverview
           bookings={bookings}
           formatDate={formatDate}
@@ -162,14 +148,13 @@ export default function LandlordDashboard() {
           handleBookingAction={handleBookingAction}
           updatingBooking={updatingBooking}
         />
-        {/* All Bookings History Overview */}
+
         <AllBookingsHistoryOverview
           bookings={bookings}
           formatDate={formatDate}
           formatCurrency={formatCurrency}
         />
 
-        {/* Properties Overview */}
         <PropertiesOverview
           properties={properties}
           bookings={bookings}

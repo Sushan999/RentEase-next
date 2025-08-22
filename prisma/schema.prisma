@@ -45,7 +45,6 @@ model Property {
   updatedAt     DateTime       @updatedAt
   landlordId    Int
 
-  // Relations
   landlord User            @relation(fields: [landlordId], references: [id], onDelete: Cascade)
   images   PropertyImage[]
   bookings Booking[]
@@ -61,7 +60,6 @@ model PropertyImage {
   propertyId Int
   createdAt  DateTime @default(now())
 
-  // Relations
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@map("property_images")
@@ -78,7 +76,6 @@ model Booking {
   tenantId   Int
   propertyId Int
 
-  // Relations
   tenant   User     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
@@ -95,7 +92,6 @@ model Review {
   tenantId   Int
   propertyId Int
 
-  // Relations
   tenant   User     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
