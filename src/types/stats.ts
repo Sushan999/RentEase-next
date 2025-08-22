@@ -4,4 +4,5 @@ export interface BookingStats {
   approved: number;
   rejected: number;
   cancelled: number;
+  completed: number;
 }
