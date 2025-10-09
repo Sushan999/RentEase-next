@@ -9,6 +9,9 @@ import { ToastContainer } from "react-toastify";
 export const metadata: Metadata = {
   title: "RentEase - Rent and List Your apartments",
   description: "Home Rental Website to rent Homes, Apartment and Villas",
+  icons: {
+    icon: "toplogo.png",
+  },
 };
 
 export default function RootLayout({
@@ -18,9 +21,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/toplogo.png" type="image/png" />
-      </head>
       <body>
         <ClientLayout>
           <Navbar />
