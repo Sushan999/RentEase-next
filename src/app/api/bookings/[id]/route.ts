@@ -33,7 +33,6 @@ export async function PUT(
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    // Check permissions
     const canUpdate =
       session.user.role === "ADMIN" ||
       (booking.property &&

@@ -24,7 +24,7 @@ export default async function PropertyPage({
   params,
   searchParams,
 }: PageProps) {
-  await searchParams; // Await searchParams to satisfy type checking
+  await searchParams;
   const { id: paramId } = await params;
   const id = Number(paramId);
 
