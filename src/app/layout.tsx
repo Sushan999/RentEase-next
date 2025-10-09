@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "RentEase - Rent and List Your apartments",
   description: "Home Rental Website to rent Homes, Apartment and Villas",
   icons: {
-    icon: "toplogo.png",
+    icon: "home.svg",
   },
 };
 
