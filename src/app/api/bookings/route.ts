@@ -4,7 +4,6 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BookingStatus } from "@prisma/client";
 
-// Gett bookings based on user role
 export async function GET(request: NextRequest) {
   try {
     // Complete booking
@@ -30,7 +29,6 @@ export async function GET(request: NextRequest) {
     let bookings;
 
     if (session.user.role === "LANDLORD") {
-      // Landlords see bookings for their properties
       bookings = await prisma.booking.findMany({
         where: {
           property: {

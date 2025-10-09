@@ -1,6 +1,5 @@
 "use client";
 
-"use client";
 import { useEffect, useState } from "react";
 import Title from "./Title";
 import PropertyCard from "./PropertyCard";
