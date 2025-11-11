@@ -12,9 +12,10 @@ import Link from "next/link";
 import { MapPin, Bed, Bath, Calendar, Star, Eye, Clock } from "lucide-react";
 import { Booking } from "@/types/booking";
 import { toast } from "react-toastify";
+import { useAppContext } from "@/context/AppContext";
 
 export default function TenantDashboard() {
-  const { data: session, status } = useSession();
+  const { session, status } = useAppContext();
   const [redirecting, setRedirecting] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [pendingBookings, setPendingBookings] = useState<Booking[]>([]);

@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ClientLayout from "./ClientLayout";
 import { ToastContainer } from "react-toastify";
+import { AppProvider } from "@/context/AppContext";
 
 export const metadata: Metadata = {
   title: "RentEase - Rent and List Your apartments",
@@ -23,14 +24,16 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ClientLayout>
-          <Navbar />
-          <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            style={{ marginTop: "4rem" }}
-          />
-          {children}
-          <Footer />
+          <AppProvider>
+            <Navbar />
+            <ToastContainer
+              position="top-right"
+              autoClose={2000}
+              style={{ marginTop: "4rem" }}
+            />
+            {children}
+            <Footer />
+          </AppProvider>
         </ClientLayout>
       </body>
     </html>
