@@ -68,13 +68,13 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     propertiesError,
   };
 
-  if (status === "loading" || propertiesLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  // if (status === "loading" || propertiesLoading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <LoadingSpinner />
+  //     </div>
+  //   );
+  // }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
