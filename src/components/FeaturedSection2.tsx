@@ -1,34 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 import Title from "./Title";
 import PropertyCard from "./PropertyCard";
-import { Property } from "@/types/property";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import { useAppContext } from "@/context/AppContext";
 
 export default function FeaturedSection2() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { properties, propertiesLoading, propertiesError } = useAppContext();
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const response = await fetch("/api/properties");
-        if (!response.ok) throw new Error("Failed to fetch properties");
-        const data = await response.json();
-        setProperties(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProperties();
-  }, []);
-
-  if (loading) {
+  if (propertiesLoading) {
     return (
       <section className="py-12">
         <div className="container mx-auto px-4">
@@ -41,7 +22,7 @@ export default function FeaturedSection2() {
               <div
                 key={i}
                 className="bg-gray-200 animate-pulse rounded-lg h-64"
-              ></div>
+              />
             ))}
           </div>
         </div>
@@ -49,7 +30,17 @@ export default function FeaturedSection2() {
     );
   }
 
-  // Sort by top reviewed (descending)
+  if (propertiesError) {
+    return (
+      <section className="py-12">
+        <div className="container mx-auto px-4 text-center text-red-500">
+          <p>{propertiesError}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Sort properties by top reviews descending
   const sortedProperties = [...properties].sort(
     (a, b) => (b.totalReviews ?? 0) - (a.totalReviews ?? 0)
   );
@@ -78,7 +69,7 @@ export default function FeaturedSection2() {
       <div className="text-center mt-12">
         <Link
           href="/properties"
-          className="bg-blue-600 text-white py-3 px-12 mb-10 rounded hover:bg-blue-800 cursor-pointer inline-block"
+          className="bg-blue-600 text-white py-3 px-12 mb-10 rounded hover:bg-blue-800 inline-block"
         >
           View all
         </Link>

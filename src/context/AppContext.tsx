@@ -4,7 +4,6 @@ import { signOut, useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import type { Property } from "@/types/property";
-import LoadingSpinner from "../components/LoadingSpinner";
 
 interface AppContextType {
   user: Session["user"] | null;
@@ -22,7 +21,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: session, status } = useSession();
   const [user, setUser] = useState<Session["user"] | null>(null);
 
-  // Property state
   const [properties, setProperties] = useState<Property[]>([]);
   const [propertiesLoading, setPropertiesLoading] = useState(true);
   const [propertiesError, setPropertiesError] = useState<string | null>(null);
@@ -67,14 +65,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     propertiesLoading,
     propertiesError,
   };
-
-  // if (status === "loading" || propertiesLoading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <LoadingSpinner />
-  //     </div>
-  //   );
-  // }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
