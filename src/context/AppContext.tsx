@@ -2,6 +2,7 @@
 import { signOut, useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { createContext, useContext, useEffect, useState } from "react";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 interface AppContextType {
   user: Session["user"] | null;
@@ -36,7 +37,12 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     handleSignOut,
   };
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading")
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

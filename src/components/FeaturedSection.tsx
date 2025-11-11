@@ -16,7 +16,7 @@ export default function FeaturedSection() {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch("/api/properties?limit=4&order=desc");
+        const response = await fetch("/api/properties");
         if (!response.ok) {
           throw new Error("Failed to fetch properties");
         }
