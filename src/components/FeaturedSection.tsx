@@ -48,7 +48,7 @@ export default function FeaturedSection() {
           subtitle="Discover our top properties"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {properties.map((property, idx) => (
+          {properties.slice(0, 4).map((property, idx) => (
             <motion.div
               key={property.id}
               initial={{ opacity: 0, y: 40 }}
