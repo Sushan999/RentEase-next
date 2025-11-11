@@ -1,38 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
-import { getSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { User as UserIcon, Mail, Phone } from "lucide-react";
-import Link from "next/link";
-import type { User } from "@/types/user";
+import { useAppContext } from "@/context/AppContext";
 
-interface SessionType {
-  user: User;
-}
+import { User as UserIcon, Mail } from "lucide-react";
+import Link from "next/link";
 
 export default function ProfilePage() {
-  const [session, setSession] = useState<SessionType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const { user, handleSignOut } = useAppContext();
 
-  useEffect(() => {
-    getSession().then((sess) => {
-      setSession(sess as SessionType | null);
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm text-center">
-          <h2 className="text-xl font-bold mb-4">Loading...</h2>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm text-center">
@@ -46,8 +21,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-
-  const user = session.user;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -66,10 +39,7 @@ export default function ProfilePage() {
           <button
             className="mt-6 w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             type="button"
-            onClick={async () => {
-              await signOut({ redirect: false });
-              router.push("/");
-            }}
+            onClick={handleSignOut}
           >
             Logout
           </button>

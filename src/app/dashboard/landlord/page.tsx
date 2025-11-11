@@ -13,9 +13,10 @@ import PendingRequestsOverview from "./components/PendingRequestsOverview";
 import AllBookingsHistoryOverview from "./components/AllBookingsHistoryOverview";
 import PropertiesOverview from "./components/PropertiesOverview";
 import Link from "next/link";
+import { useAppContext } from "@/context/AppContext";
 
 export default function LandlordDashboard() {
-  const { data: session, status } = useSession();
+  const { session, status } = useAppContext();
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);

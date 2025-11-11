@@ -12,9 +12,11 @@ import UserManagementOverview from "./components/UserManagementOverview";
 import PropertiesHistoryOverview from "./components/PropertiesHistoryOverview";
 import PendingPropertiesOverview from "./components/PendingPropertiesOverview";
 import AdminSummaryCards from "./components/AdminSummaryCards";
+import { useAppContext } from "@/context/AppContext";
 
 export default function AdminDashboard() {
-  const { data: session, status } = useSession();
+  const { session, status } = useAppContext();
+
   const router = useRouter();
 
   const [allProperties, setAllProperties] = useState<Property[]>([]);

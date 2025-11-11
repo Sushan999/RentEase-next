@@ -6,13 +6,15 @@ import { useSession, signOut } from "next-auth/react";
 import { Menu, X, Home, User, LogOut, Settings } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import Image from "next/image";
+import { useAppContext } from "@/context/AppContext";
 
 export default function Navbar() {
+  const { handleSignOut } = useAppContext();
+
   const [isOpen, setIsOpen] = useState(false);
   const { data: session, status } = useSession();
 
   const toggleMenu = () => setIsOpen(!isOpen);
-  const handleSignOut = () => signOut({ callbackUrl: "/" });
 
   const getDashboardLink = () => {
     if (!session?.user) return "/dashboard";
